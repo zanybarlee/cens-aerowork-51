@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Rocket, Database, ChartLine, Cog, UserCheck, Plane, Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ChatBot } from "@/components/ChatBot/ChatBot";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -117,6 +118,8 @@ const Index = () => {
           </Button>
         </div>
       </section>
+
+      <ChatBot />
     </div>
   );
 };

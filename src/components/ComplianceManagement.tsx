@@ -76,6 +76,22 @@ export function ComplianceManagement() {
       status: "in-progress",
       priority: "high",
     },
+    {
+      id: 4,
+      directive: "SB 407-24-01",
+      description: "Engine Control Unit Update",
+      deadline: "2024-06-15",
+      status: "pending",
+      priority: "medium",
+    },
+    {
+      id: 5,
+      directive: "AD 2024-04",
+      description: "Fuel System Inspection",
+      deadline: "2024-05-30",
+      status: "pending",
+      priority: "high",
+    }
   ];
 
   const query = async (data: { question: string }) => {

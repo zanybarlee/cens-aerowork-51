@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Shield, Wrench, ClipboardCheck, Plane } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export type UserRole = {
   id: string;
@@ -63,8 +64,15 @@ interface RoleSelectorProps {
 }
 
 export function RoleSelector({ open, onClose, onRoleSelect }: RoleSelectorProps) {
+  const navigate = useNavigate();
+
+  const handleClose = () => {
+    navigate("/login");
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-2xl bg-white">
         <DialogHeader className="bg-white rounded-t-lg">
           <DialogTitle className="text-2xl font-bold text-workspace-primary">

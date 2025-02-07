@@ -32,6 +32,10 @@ const Dashboard = () => {
     }
   };
 
+  const handleRoleSelectorClose = () => {
+    setShowRoleSelector(false);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-workspace-background to-workspace-secondary/10 p-8">
       <Button 
@@ -45,7 +49,7 @@ const Dashboard = () => {
 
       <RoleSelector
         open={showRoleSelector}
-        onClose={() => setShowRoleSelector(false)}
+        onClose={handleRoleSelectorClose}
         onRoleSelect={handleRoleSelect}
       />
 

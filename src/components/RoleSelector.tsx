@@ -23,35 +23,35 @@ const roles: UserRole[] = [
     id: "maintenance-planner",
     title: "Maintenance Planner",
     icon: <Plane className="h-6 w-6" />,
-    description: "Schedule and allocate resources for maintenance",
+    description: "Schedule and allocate resources",
     module: "both",
   },
   {
     id: "engineer-technician",
     title: "Engineer & Technician",
     icon: <Wrench className="h-6 w-6" />,
-    description: "Execute maintenance tasks and update work cards",
+    description: "Execute maintenance tasks",
     module: "both",
   },
   {
     id: "quality-inspector",
     title: "Quality Assurance & Inspector",
     icon: <ClipboardCheck className="h-6 w-6" />,
-    description: "Validate compliance and verify task completion",
+    description: "Validate compliance and tasks",
     module: "both",
   },
   {
     id: "compliance-manager",
     title: "Compliance Manager",
     icon: <Shield className="h-6 w-6" />,
-    description: "Oversee adherence to airworthiness directives",
+    description: "Oversee airworthiness directives",
     module: "compliance",
   },
   {
     id: "fleet-manager",
     title: "Fleet Manager",
     icon: <Plane className="h-6 w-6" />,
-    description: "Monitor fleet readiness and plan maintenance",
+    description: "Monitor fleet readiness",
     module: "workcard",
   },
 ];
@@ -84,7 +84,7 @@ export function RoleSelector({ open, onClose, onRoleSelect }: RoleSelectorProps)
             >
               <div className="text-workspace-primary mb-2">{role.icon}</div>
               <h3 className="font-semibold mb-1">{role.title}</h3>
-              <p className="text-sm text-muted-foreground max-w-[200px]">{role.description}</p>
+              <p className="text-sm text-muted-foreground max-w-[150px]">{role.description}</p>
             </Button>
           ))}
         </div>

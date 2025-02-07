@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,7 +33,11 @@ interface ComplianceResponse {
   status?: 'pending' | 'in-progress' | 'completed';
 }
 
-export function ComplianceManagement() {
+interface ComplianceManagementProps {
+  userRole: string;
+}
+
+export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
@@ -44,12 +47,12 @@ export function ComplianceManagement() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Load stored responses from localStorage
-    const storedResponses = localStorage.getItem("complianceResponses");
+    // Load stored responses from localStorage based on userRole
+    const storedResponses = localStorage.getItem(`complianceResponses_${userRole}`);
     if (storedResponses) {
       setResponses(JSON.parse(storedResponses));
     }
-  }, []);
+  }, [userRole]);
 
   const complianceTasks = [
     {
@@ -141,7 +144,7 @@ export function ComplianceManagement() {
 
       const updatedResponses = [...responses, newResponse];
       setResponses(updatedResponses);
-      localStorage.setItem("complianceResponses", JSON.stringify(updatedResponses));
+      localStorage.setItem(`complianceResponses_${userRole}`, JSON.stringify(updatedResponses));
 
       setAiResponse(response);
       setIsModalOpen(true);
@@ -167,7 +170,7 @@ export function ComplianceManagement() {
   const handleDeleteResponse = (id: string) => {
     const updatedResponses = responses.filter(response => response.id !== id);
     setResponses(updatedResponses);
-    localStorage.setItem("complianceResponses", JSON.stringify(updatedResponses));
+    localStorage.setItem(`complianceResponses_${userRole}`, JSON.stringify(updatedResponses));
     
     toast({
       title: "Success",

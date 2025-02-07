@@ -72,7 +72,7 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-bold text-workspace-primary mb-6">
                   Compliance Management
                 </h2>
-                <ComplianceManagement />
+                <ComplianceManagement userRole={selectedRole.id} />
               </div>
             )}
           </div>

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,10 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -23,12 +24,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 
+interface ComplianceResponse {
+  id: string;
+  directive: string;
+  response: string;
+  timestamp: string;
+}
+
 export function ComplianceManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
   const [directive, setDirective] = useState("");
+  const [responses, setResponses] = useState<ComplianceResponse[]>([]);
+  const [selectedResponse, setSelectedResponse] = useState<ComplianceResponse | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Load stored responses from localStorage
+    const storedResponses = localStorage.getItem("complianceResponses");
+    if (storedResponses) {
+      setResponses(JSON.parse(storedResponses));
+    }
+  }, []);
 
   const complianceTasks = [
     {
@@ -86,8 +104,23 @@ export function ComplianceManagement() {
     try {
       const prompt = `can you provide Text Analysis and Categorization of ${directive}`;
       const response = await query({ question: prompt });
+      
+      // Create new response object
+      const newResponse: ComplianceResponse = {
+        id: Date.now().toString(),
+        directive: directive,
+        response: response,
+        timestamp: new Date().toLocaleString(),
+      };
+
+      // Update state and localStorage
+      const updatedResponses = [...responses, newResponse];
+      setResponses(updatedResponses);
+      localStorage.setItem("complianceResponses", JSON.stringify(updatedResponses));
+
       setAiResponse(response);
       setIsModalOpen(true);
+      setDirective("");
     } catch (error) {
       toast({
         title: "Error",
@@ -98,6 +131,23 @@ export function ComplianceManagement() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleViewResponse = (response: ComplianceResponse) => {
+    setSelectedResponse(response);
+    setAiResponse(response.response);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteResponse = (id: string) => {
+    const updatedResponses = responses.filter(response => response.id !== id);
+    setResponses(updatedResponses);
+    localStorage.setItem("complianceResponses", JSON.stringify(updatedResponses));
+    
+    toast({
+      title: "Success",
+      description: "Response deleted successfully",
+    });
   };
 
   const getStatusBadge = (status: string) => {
@@ -170,7 +220,7 @@ export function ComplianceManagement() {
             </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -205,13 +255,65 @@ export function ComplianceManagement() {
               </TableBody>
             </Table>
           </div>
+
+          {responses.length > 0 && (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Directive</TableHead>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {responses.map((response) => (
+                    <TableRow key={response.id}>
+                      <TableCell className="font-medium">{response.directive}</TableCell>
+                      <TableCell>{response.timestamp}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewResponse(response)}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteResponse(response.id)}
+                          className="text-destructive hover:text-destructive/90"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Compliance Analysis</DialogTitle>
+            <DialogTitle>
+              Compliance Analysis
+              {selectedResponse && (
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ({selectedResponse.timestamp})
+                </span>
+              )}
+            </DialogTitle>
+            {selectedResponse && (
+              <DialogDescription>
+                Directive: {selectedResponse.directive}
+              </DialogDescription>
+            )}
           </DialogHeader>
           <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg">
             <ReactMarkdown>{aiResponse}</ReactMarkdown>

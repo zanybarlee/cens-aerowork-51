@@ -23,7 +23,7 @@ const roles: UserRole[] = [
     id: "maintenance-planner",
     title: "Maintenance Planner",
     icon: <Plane className="h-6 w-6" />,
-    description: "Schedule and allocate resources for maintenance activities",
+    description: "Schedule and allocate resources for maintenance",
     module: "both",
   },
   {
@@ -84,7 +84,7 @@ export function RoleSelector({ open, onClose, onRoleSelect }: RoleSelectorProps)
             >
               <div className="text-workspace-primary mb-2">{role.icon}</div>
               <h3 className="font-semibold mb-1">{role.title}</h3>
-              <p className="text-sm text-muted-foreground">{role.description}</p>
+              <p className="text-sm text-muted-foreground max-w-[200px]">{role.description}</p>
             </Button>
           ))}
         </div>

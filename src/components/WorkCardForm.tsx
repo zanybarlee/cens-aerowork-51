@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,12 +17,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +45,7 @@ export function WorkCardForm() {
   const [workCard, setWorkCard] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>([]);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
   const handleFlightHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,6 +90,7 @@ export function WorkCardForm() {
       const prompt = generatePrompt(flightHours, cycles, environment);
       const response = await query({ question: prompt });
       setWorkCard(response);
+      setIsDetailsOpen(true);
 
       const newWorkCard: StoredWorkCard = {
         id: Date.now().toString(),
@@ -126,6 +128,7 @@ export function WorkCardForm() {
 
   const handleViewDetails = (content: string) => {
     setWorkCard(content);
+    setIsDetailsOpen(true);
   };
 
   return (
@@ -230,20 +233,16 @@ export function WorkCardForm() {
         </CardContent>
       </Card>
 
-      {workCard && (
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold text-workspace-text">
-              Work Card Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg overflow-auto">
-              <ReactMarkdown>{workCard}</ReactMarkdown>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Work Card Details</DialogTitle>
+          </DialogHeader>
+          <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg">
+            <ReactMarkdown>{workCard}</ReactMarkdown>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {storedWorkCards.length > 0 && (
         <Card className="w-full">

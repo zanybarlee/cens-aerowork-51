@@ -4,11 +4,15 @@ import { RoleSelector, UserRole } from "@/components/RoleSelector";
 import { WorkCardForm } from "@/components/WorkCardForm";
 import { ComplianceManagement } from "@/components/ComplianceManagement";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [showRoleSelector, setShowRoleSelector] = React.useState(true);
   const [selectedRole, setSelectedRole] = React.useState<UserRole | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
@@ -19,8 +23,26 @@ const Dashboard = () => {
     });
   };
 
+  const handleBack = () => {
+    if (selectedRole) {
+      setSelectedRole(null);
+      setShowRoleSelector(true);
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-workspace-background to-workspace-secondary/10 p-8">
+      <Button 
+        variant="ghost" 
+        onClick={handleBack}
+        className="mb-4 flex items-center gap-2 text-workspace-primary hover:text-workspace-primary/90"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back
+      </Button>
+
       <RoleSelector
         open={showRoleSelector}
         onClose={() => setShowRoleSelector(false)}

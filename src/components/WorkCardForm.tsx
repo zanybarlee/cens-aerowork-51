@@ -5,8 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Info } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface StoredWorkCard {
   id: string;
@@ -55,7 +64,6 @@ export function WorkCardForm() {
       const response = await query({ question: prompt });
       setWorkCard(response);
 
-      // Store the generated work card
       const newWorkCard: StoredWorkCard = {
         id: Date.now().toString(),
         content: response,
@@ -90,12 +98,16 @@ export function WorkCardForm() {
     });
   };
 
+  const handleViewDetails = (content: string) => {
+    setWorkCard(content);
+  };
+
   return (
     <div className="space-y-6">
       <Card className="w-full transition-all duration-300 hover:shadow-lg animate-fadeIn">
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-workspace-text">
-            Work Card Details
+            Work Card Generator
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -154,7 +166,7 @@ export function WorkCardForm() {
         <Card className="w-full">
           <CardHeader>
             <CardTitle className="text-xl font-semibold text-workspace-text">
-              Generated Work Card
+              Work Card Details
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -172,34 +184,50 @@ export function WorkCardForm() {
               Stored Work Cards
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {storedWorkCards.map((card) => (
-              <Card key={card.id} className="relative">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <div className="text-sm text-muted-foreground">
-                      Flight Hours: {card.flightHours} | Cycles: {card.cycles} | Environment: {card.environment}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">{card.date}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(card.id)}
-                        className="text-destructive hover:text-destructive/90"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg overflow-auto">
-                    <ReactMarkdown>{card.content}</ReactMarkdown>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Environment</TableHead>
+                    <TableHead>Flight Hours</TableHead>
+                    <TableHead>Cycles</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {storedWorkCards.map((card) => (
+                    <TableRow key={card.id}>
+                      <TableCell>{card.date}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{card.environment}</Badge>
+                      </TableCell>
+                      <TableCell>{card.flightHours}</TableCell>
+                      <TableCell>{card.cycles}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewDetails(card.content)}
+                        >
+                          <Info className="h-4 w-4 mr-1" />
+                          View Details
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(card.id)}
+                          className="text-destructive hover:text-destructive/90"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       )}

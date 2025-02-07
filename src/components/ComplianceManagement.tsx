@@ -278,7 +278,11 @@ export function ComplianceManagement() {
                 <TableBody>
                   {responses.map((response) => (
                     <TableRow key={response.id}>
-                      <TableCell className="font-medium">{response.directive}</TableCell>
+                      <TableCell className="font-medium max-w-[200px]">
+                        <span className="block truncate" title={response.directive}>
+                          {response.directive}
+                        </span>
+                      </TableCell>
                       <TableCell>{response.deadline}</TableCell>
                       <TableCell>{getPriorityBadge(response.priority || 'medium')}</TableCell>
                       <TableCell>{getStatusBadge(response.status || 'pending')}</TableCell>

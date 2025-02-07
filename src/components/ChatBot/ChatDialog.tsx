@@ -32,6 +32,12 @@ async function query(data: { question: string }) {
   return result;
 }
 
+const starterPrompts = [
+  "Tell me about aircraft maintenance procedures",
+  "What are common MRO challenges?",
+  "How can I improve compliance tracking?",
+];
+
 export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -78,6 +84,10 @@ export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
     }
   };
 
+  const handleStarterPrompt = (prompt: string) => {
+    setInputMessage(prompt);
+  };
+
   const handleClearChat = () => {
     setMessages([]);
     toast({
@@ -102,6 +112,21 @@ export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
         </div>
         
         <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+          {messages.length === 0 && (
+            <div className="p-4 space-y-2">
+              <p className="text-sm text-workspace-text/70 mb-2">Try asking about:</p>
+              {starterPrompts.map((prompt, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="w-full justify-start text-left mb-2 h-auto whitespace-normal"
+                  onClick={() => handleStarterPrompt(prompt)}
+                >
+                  {prompt}
+                </Button>
+              ))}
+            </div>
+          )}
           {messages.map((message, index) => (
             <ChatMessage
               key={index}

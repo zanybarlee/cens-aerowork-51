@@ -60,7 +60,7 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-bold text-workspace-primary mb-6">
                   Work Card Generator
                 </h2>
-                <WorkCardForm />
+                <WorkCardForm userRole={selectedRole.id} />
               </div>
             )}
             {(selectedRole.module === "compliance" || selectedRole.module === "both") && (

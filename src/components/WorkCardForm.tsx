@@ -36,15 +36,23 @@ interface StoredWorkCard {
   cycles: string;
   environment: string;
   date: string;
+  role: string;
 }
 
-export function WorkCardForm() {
+interface WorkCardFormProps {
+  userRole: string;
+}
+
+export function WorkCardForm({ userRole }: WorkCardFormProps) {
   const [flightHours, setFlightHours] = useState("100");
   const [cycles, setCycles] = useState("");
   const [environment, setEnvironment] = useState("");
   const [workCard, setWorkCard] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
-  const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>([]);
+  const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>(() => {
+    const saved = localStorage.getItem(`workCards_${userRole}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const { toast } = useToast();
 
@@ -99,8 +107,12 @@ export function WorkCardForm() {
         cycles,
         environment,
         date: new Date().toLocaleDateString(),
+        role: userRole
       };
-      setStoredWorkCards((prev) => [newWorkCard, ...prev]);
+      
+      const updatedWorkCards = [newWorkCard, ...storedWorkCards];
+      setStoredWorkCards(updatedWorkCards);
+      localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
 
       toast({
         title: "Work Card Generated",
@@ -119,7 +131,10 @@ export function WorkCardForm() {
   };
 
   const handleDelete = (id: string) => {
-    setStoredWorkCards((prev) => prev.filter((card) => card.id !== id));
+    const updatedWorkCards = storedWorkCards.filter((card) => card.id !== id);
+    setStoredWorkCards(updatedWorkCards);
+    localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
+    
     toast({
       title: "Work Card Deleted",
       description: "The work card has been deleted successfully.",

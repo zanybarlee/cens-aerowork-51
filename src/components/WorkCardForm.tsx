@@ -11,6 +11,7 @@ export function WorkCardForm() {
   const [flightHours, setFlightHours] = useState("");
   const [cycles, setCycles] = useState("");
   const [environment, setEnvironment] = useState("");
+  const [workCard, setWorkCard] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -36,18 +37,17 @@ export function WorkCardForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setWorkCard("");
 
     try {
       const prompt = generatePrompt(flightHours, cycles, environment);
       const response = await query({ question: prompt });
+      setWorkCard(response);
 
       toast({
         title: "Work Card Generated",
         description: "The work card has been generated successfully.",
       });
-
-      // You can add additional handling for the response here
-      console.log("Generated Work Card:", response);
     } catch (error) {
       toast({
         title: "Error",
@@ -61,62 +61,79 @@ export function WorkCardForm() {
   };
 
   return (
-    <Card className="w-full transition-all duration-300 hover:shadow-lg animate-fadeIn">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold text-workspace-text">
-          Work Card Details
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="flightHours">Flight Hours</Label>
-            <Input
-              id="flightHours"
-              type="number"
-              placeholder="Enter total flight hours"
-              value={flightHours}
-              onChange={(e) => setFlightHours(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cycles">Cycles</Label>
-            <Input
-              id="cycles"
-              type="number"
-              placeholder="Enter total cycles"
-              value={cycles}
-              onChange={(e) => setCycles(e.target.value)}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="environment">Operating Environment</Label>
-            <Input
-              id="environment"
-              placeholder="e.g., Coastal, Desert, Arctic"
-              value={environment}
-              onChange={(e) => setEnvironment(e.target.value)}
-              required
-            />
-          </div>
-          <Button 
-            type="submit"
-            className="w-full bg-workspace-primary hover:bg-workspace-primary/90 text-white"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              "Generate Work Card"
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card className="w-full transition-all duration-300 hover:shadow-lg animate-fadeIn">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold text-workspace-text">
+            Work Card Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="flightHours">Flight Hours</Label>
+              <Input
+                id="flightHours"
+                type="number"
+                placeholder="Enter total flight hours"
+                value={flightHours}
+                onChange={(e) => setFlightHours(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cycles">Cycles</Label>
+              <Input
+                id="cycles"
+                type="number"
+                placeholder="Enter total cycles"
+                value={cycles}
+                onChange={(e) => setCycles(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="environment">Operating Environment</Label>
+              <Input
+                id="environment"
+                placeholder="e.g., Coastal, Desert, Arctic"
+                value={environment}
+                onChange={(e) => setEnvironment(e.target.value)}
+                required
+              />
+            </div>
+            <Button 
+              type="submit"
+              className="w-full bg-workspace-primary hover:bg-workspace-primary/90 text-white"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                "Generate Work Card"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {workCard && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-workspace-text">
+              Generated Work Card
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="whitespace-pre-wrap bg-muted p-4 rounded-lg">
+              {workCard}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 }

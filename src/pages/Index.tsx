@@ -1,10 +1,15 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Rocket, Database, ChartLine, Cog, UserCheck, Plane, Wrench } from "lucide-react";
+import { WorkCardForm } from "@/components/WorkCardForm";
+import { ComplianceManagement } from "@/components/ComplianceManagement";
 
 const Index = () => {
+  const [showModules, setShowModules] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-workspace-background to-workspace-secondary/10">
       {/* Hero Section */}
@@ -17,7 +22,10 @@ const Index = () => {
             Next-generation AI-powered platform for aerospace maintenance, repair, and overhaul operations
           </p>
           <div className="flex justify-center gap-4 pt-4">
-            <Button className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg">
+            <Button 
+              className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg"
+              onClick={() => setShowModules(true)}
+            >
               Get Started
             </Button>
             <Button variant="outline" className="border-workspace-primary text-workspace-primary px-8 py-6 text-lg">
@@ -26,6 +34,22 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Modules Section - Only shown after clicking Get Started */}
+      {showModules && (
+        <section className="container mx-auto py-16 px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-workspace-primary mb-6">Work Card Generator</h2>
+              <WorkCardForm />
+            </div>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-workspace-primary mb-6">Compliance Management</h2>
+              <ComplianceManagement />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Key Features Section */}
       <section className="container mx-auto py-16 px-4">

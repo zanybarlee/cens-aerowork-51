@@ -29,6 +29,9 @@ interface ComplianceResponse {
   directive: string;
   response: string;
   timestamp: string;
+  deadline?: string;
+  priority?: 'high' | 'medium' | 'low';
+  status?: 'pending' | 'in-progress' | 'completed';
 }
 
 export function ComplianceManagement() {
@@ -105,12 +108,15 @@ export function ComplianceManagement() {
       const prompt = `can you provide Text Analysis and Categorization of ${directive}`;
       const response = await query({ question: prompt });
       
-      // Create new response object
+      // Create new response object with default values for new fields
       const newResponse: ComplianceResponse = {
         id: Date.now().toString(),
         directive: directive,
         response: response,
         timestamp: new Date().toLocaleString(),
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+        priority: 'medium',
+        status: 'pending'
       };
 
       // Update state and localStorage
@@ -262,6 +268,9 @@ export function ComplianceManagement() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Directive</TableHead>
+                    <TableHead>Deadline</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Timestamp</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -270,6 +279,9 @@ export function ComplianceManagement() {
                   {responses.map((response) => (
                     <TableRow key={response.id}>
                       <TableCell className="font-medium">{response.directive}</TableCell>
+                      <TableCell>{response.deadline}</TableCell>
+                      <TableCell>{getPriorityBadge(response.priority || 'medium')}</TableCell>
+                      <TableCell>{getStatusBadge(response.status || 'pending')}</TableCell>
                       <TableCell>{response.timestamp}</TableCell>
                       <TableCell className="text-right space-x-2">
                         <Button

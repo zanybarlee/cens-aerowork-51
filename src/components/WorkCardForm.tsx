@@ -16,6 +16,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StoredWorkCard {
   id: string;
@@ -27,7 +34,7 @@ interface StoredWorkCard {
 }
 
 export function WorkCardForm() {
-  const [flightHours, setFlightHours] = useState("");
+  const [flightHours, setFlightHours] = useState("100");
   const [cycles, setCycles] = useState("");
   const [environment, setEnvironment] = useState("");
   const [workCard, setWorkCard] = useState<string>("");
@@ -114,14 +121,19 @@ export function WorkCardForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="flightHours">Flight Hours</Label>
-              <Input
-                id="flightHours"
-                type="number"
-                placeholder="Enter total flight hours"
+              <Select
                 value={flightHours}
-                onChange={(e) => setFlightHours(e.target.value)}
-                required
-              />
+                onValueChange={setFlightHours}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select flight hours" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="100">100 Hours</SelectItem>
+                  <SelectItem value="300">300 Hours</SelectItem>
+                  <SelectItem value="600">600 Hours</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cycles">Cycles</Label>

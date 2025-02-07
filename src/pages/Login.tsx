@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { User, Lock } from "lucide-react";
+import { User, Lock, ChevronLeft } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,6 +26,14 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-workspace-background to-workspace-secondary/10">
+      <Button
+        variant="ghost"
+        className="absolute top-4 left-4 flex items-center gap-2"
+        onClick={() => navigate("/")}
+      >
+        <ChevronLeft className="h-4 w-4" />
+        Back to Home
+      </Button>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center font-bold text-workspace-primary">

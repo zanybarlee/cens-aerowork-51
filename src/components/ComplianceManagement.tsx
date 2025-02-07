@@ -124,18 +124,21 @@ export function ComplianceManagement() {
       const prompt = `can you provide Text Analysis and Categorization of ${directive}`;
       const response = await query({ question: prompt });
       
-      // Create new response object with default values for new fields
+      // Generate a random deadline between 15 and 45 days from now
+      const randomDays = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
+      const deadline = new Date();
+      deadline.setDate(deadline.getDate() + randomDays);
+      
       const newResponse: ComplianceResponse = {
         id: Date.now().toString(),
         directive: directive,
         response: response,
         timestamp: new Date().toLocaleString(),
-        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-        priority: 'medium',
+        deadline: deadline.toISOString().split('T')[0],
+        priority: Math.random() < 0.4 ? 'high' : Math.random() < 0.7 ? 'medium' : 'low',
         status: 'pending'
       };
 
-      // Update state and localStorage
       const updatedResponses = [...responses, newResponse];
       setResponses(updatedResponses);
       localStorage.setItem("complianceResponses", JSON.stringify(updatedResponses));

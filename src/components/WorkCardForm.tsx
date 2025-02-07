@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +22,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface StoredWorkCard {
   id: string;
@@ -41,6 +46,13 @@ export function WorkCardForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>([]);
   const { toast } = useToast();
+
+  const handleFlightHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (!isNaN(Number(value))) {
+      setFlightHours(value);
+    }
+  };
 
   const generatePrompt = (flightHours: string, cycles: string, environment: string) => {
     return `For aircraft with ${flightHours} flight hours, ${cycles} cycles, operating in ${environment} environment, considering Every third 100 hour inspection (300 hours) or every 12 months & DMC-412-A-96-00-00-00A-00SA-A, can you provide all the related inspection description, tasks and parts and generate the work card?`;
@@ -121,19 +133,35 @@ export function WorkCardForm() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="flightHours">Flight Hours</Label>
-              <Select
-                value={flightHours}
-                onValueChange={setFlightHours}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select flight hours" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="100">100 Hours</SelectItem>
-                  <SelectItem value="300">300 Hours</SelectItem>
-                  <SelectItem value="600">600 Hours</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="relative flex gap-2">
+                <Input
+                  id="flightHours"
+                  type="text"
+                  placeholder="Enter flight hours"
+                  value={flightHours}
+                  onChange={handleFlightHoursChange}
+                  className="flex-1"
+                  required
+                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" type="button">
+                      Presets
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setFlightHours("100")}>
+                      100 Hours
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFlightHours("300")}>
+                      300 Hours
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFlightHours("600")}>
+                      600 Hours
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="cycles">Cycles</Label>

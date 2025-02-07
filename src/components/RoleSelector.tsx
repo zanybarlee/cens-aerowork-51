@@ -84,7 +84,7 @@ export function RoleSelector({ open, onClose, onRoleSelect }: RoleSelectorProps)
             >
               <div className="text-workspace-primary mb-2">{role.icon}</div>
               <h3 className="font-semibold mb-1">{role.title}</h3>
-              <p className="text-sm text-muted-foreground max-w-[150px]">{role.description}</p>
+              <p className="text-sm text-muted-foreground w-full px-2 break-words">{role.description}</p>
             </Button>
           ))}
         </div>

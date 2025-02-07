@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { RefreshCw, Send } from "lucide-react";
 import { ChatMessage } from "./ChatMessage";
 import { useToast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   text: string;
@@ -53,16 +54,16 @@ export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const handleSendMessage = async (messageToSend: string) => {
+    if (!messageToSend.trim()) return;
 
-    const userMessage = { text: inputMessage, isBot: false };
+    const userMessage = { text: messageToSend, isBot: false };
     setMessages((prev) => [...prev, userMessage]);
     setInputMessage("");
     setIsLoading(true);
 
     try {
-      const response = await query({ question: inputMessage });
+      const response = await query({ question: messageToSend });
       const botMessage = { text: response.text, isBot: true };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
@@ -80,12 +81,12 @@ export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSendMessage(inputMessage);
     }
   };
 
-  const handleStarterPrompt = (prompt: string) => {
-    setInputMessage(prompt);
+  const handleStarterPrompt = async (prompt: string) => {
+    await handleSendMessage(prompt);
   };
 
   const handleClearChat = () => {
@@ -147,7 +148,7 @@ export function ChatDialog({ open, onOpenChange }: ChatDialogProps) {
             className="flex-1"
           />
           <Button 
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage(inputMessage)}
             disabled={isLoading || !inputMessage.trim()}
           >
             <Send className="h-4 w-4" />

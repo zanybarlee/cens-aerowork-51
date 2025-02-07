@@ -2,6 +2,7 @@
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bot, User } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 export interface ChatMessageProps {
   message: string;
@@ -25,7 +26,13 @@ export function ChatMessage({ message, isBot }: ChatMessageProps) {
             : "bg-workspace-primary text-white"
         }`}
       >
-        {message}
+        {isBot ? (
+          <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert prose-p:leading-relaxed prose-pre:p-0">
+            {message}
+          </ReactMarkdown>
+        ) : (
+          message
+        )}
       </div>
       {!isBot && (
         <Avatar className="w-8 h-8">

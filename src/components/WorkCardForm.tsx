@@ -5,8 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+
+interface StoredWorkCard {
+  id: string;
+  content: string;
+  flightHours: string;
+  cycles: string;
+  environment: string;
+  date: string;
+}
 
 export function WorkCardForm() {
   const [flightHours, setFlightHours] = useState("");
@@ -14,6 +23,7 @@ export function WorkCardForm() {
   const [environment, setEnvironment] = useState("");
   const [workCard, setWorkCard] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>([]);
   const { toast } = useToast();
 
   const generatePrompt = (flightHours: string, cycles: string, environment: string) => {
@@ -45,9 +55,20 @@ export function WorkCardForm() {
       const response = await query({ question: prompt });
       setWorkCard(response);
 
+      // Store the generated work card
+      const newWorkCard: StoredWorkCard = {
+        id: Date.now().toString(),
+        content: response,
+        flightHours,
+        cycles,
+        environment,
+        date: new Date().toLocaleDateString(),
+      };
+      setStoredWorkCards((prev) => [newWorkCard, ...prev]);
+
       toast({
         title: "Work Card Generated",
-        description: "The work card has been generated successfully.",
+        description: "The work card has been generated and stored successfully.",
       });
     } catch (error) {
       toast({
@@ -59,6 +80,14 @@ export function WorkCardForm() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setStoredWorkCards((prev) => prev.filter((card) => card.id !== id));
+    toast({
+      title: "Work Card Deleted",
+      description: "The work card has been deleted successfully.",
+    });
   };
 
   return (
@@ -132,6 +161,45 @@ export function WorkCardForm() {
             <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg overflow-auto">
               <ReactMarkdown>{workCard}</ReactMarkdown>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {storedWorkCards.length > 0 && (
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold text-workspace-text">
+              Stored Work Cards
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {storedWorkCards.map((card) => (
+              <Card key={card.id} className="relative">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-muted-foreground">
+                      Flight Hours: {card.flightHours} | Cycles: {card.cycles} | Environment: {card.environment}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{card.date}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(card.id)}
+                        className="text-destructive hover:text-destructive/90"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg overflow-auto">
+                    <ReactMarkdown>{card.content}</ReactMarkdown>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </CardContent>
         </Card>
       )}

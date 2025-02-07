@@ -54,6 +54,13 @@ export function WorkCardForm() {
     }
   };
 
+  const handleCyclesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (!isNaN(Number(value))) {
+      setCycles(value);
+    }
+  };
+
   const generatePrompt = (flightHours: string, cycles: string, environment: string) => {
     return `For aircraft with ${flightHours} flight hours, ${cycles} cycles, operating in ${environment} environment, considering Every third 100 hour inspection (300 hours) or every 12 months & DMC-412-A-96-00-00-00A-00SA-A, can you provide all the related inspection description, tasks and parts and generate the work card?`;
   };
@@ -165,14 +172,35 @@ export function WorkCardForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="cycles">Cycles</Label>
-              <Input
-                id="cycles"
-                type="number"
-                placeholder="Enter total cycles"
-                value={cycles}
-                onChange={(e) => setCycles(e.target.value)}
-                required
-              />
+              <div className="relative flex gap-2">
+                <Input
+                  id="cycles"
+                  type="text"
+                  placeholder="Enter total cycles"
+                  value={cycles}
+                  onChange={handleCyclesChange}
+                  className="flex-1"
+                  required
+                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" type="button">
+                      Presets
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setCycles("10")}>
+                      10 Cycles
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setCycles("20")}>
+                      20 Cycles
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setCycles("50")}>
+                      50 Cycles
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="environment">Operating Environment</Label>

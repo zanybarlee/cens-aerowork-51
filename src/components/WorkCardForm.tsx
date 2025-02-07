@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 export function WorkCardForm() {
   const [flightHours, setFlightHours] = useState("");
@@ -128,8 +129,8 @@ export function WorkCardForm() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="whitespace-pre-wrap bg-muted p-4 rounded-lg">
-              {workCard}
+            <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg overflow-auto">
+              <ReactMarkdown>{workCard}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>

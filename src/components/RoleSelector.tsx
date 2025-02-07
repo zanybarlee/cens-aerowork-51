@@ -71,13 +71,13 @@ export function RoleSelector({ open, onClose, onRoleSelect }: RoleSelectorProps)
             Select Your Role
           </DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-b-lg">
+        <div className="flex flex-wrap justify-center gap-4 p-4 bg-white rounded-b-lg">
           {roles.map((role) => (
             <Button
               key={role.id}
               variant="outline"
               className={cn(
-                "h-auto p-4 flex flex-col items-center text-center hover:bg-workspace-primary/5",
+                "w-[220px] h-auto p-4 flex flex-col items-center text-center hover:bg-workspace-primary/5",
                 "border-2 hover:border-workspace-primary transition-all duration-200 bg-white"
               )}
               onClick={() => onRoleSelect(role)}

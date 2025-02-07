@@ -13,7 +13,7 @@ const Index = () => {
       <section className="container mx-auto py-16 px-4">
         <div className="text-center space-y-6 animate-fadeIn">
           <h1 className="text-5xl font-bold text-workspace-primary">
-            AI AeroGuardian
+            Aptiv8 GenAI AeroGuardian
           </h1>
           <p className="text-2xl text-workspace-text/80 max-w-3xl mx-auto">
             Next-generation AI-powered platform for aerospace maintenance, repair, and overhaul operations
@@ -74,7 +74,7 @@ const Index = () => {
       {/* Benefits Section */}
       <section className="container mx-auto py-16 px-4 bg-workspace-secondary/5 rounded-lg">
         <h2 className="text-3xl font-bold text-workspace-primary text-center mb-12">
-          Why Choose AI AeroGuardian?
+          Why Choose Aptiv8 GenAI AeroGuardian?
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <BenefitItem
@@ -107,7 +107,7 @@ const Index = () => {
             Ready to Transform Your MRO Operations?
           </h2>
           <p className="text-lg text-workspace-text/80">
-            Join the future of aerospace maintenance with AI AeroGuardian
+            Join the future of aerospace maintenance with Aptiv8 GenAI AeroGuardian
           </p>
           <Button 
             className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg mt-6"

@@ -37,7 +37,7 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center font-bold text-workspace-primary">
-            Login to AI AeroGuardian
+            Login to Aptiv8 GenAI AeroGuardian
           </CardTitle>
         </CardHeader>
         <CardContent>

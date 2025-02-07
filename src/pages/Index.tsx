@@ -2,26 +2,10 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Rocket, Database, ChartLine, Cog, UserCheck, Plane, Wrench } from "lucide-react";
-import { WorkCardForm } from "@/components/WorkCardForm";
-import { ComplianceManagement } from "@/components/ComplianceManagement";
-import { RoleSelector, UserRole } from "@/components/RoleSelector";
-import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [showRoleSelector, setShowRoleSelector] = React.useState(false);
-  const [selectedRole, setSelectedRole] = React.useState<UserRole | null>(null);
-  const { toast } = useToast();
-
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role);
-    setShowRoleSelector(false);
-    toast({
-      title: "Welcome!",
-      description: `You are now logged in as ${role.title}`,
-    });
-  };
-
-  const showModules = selectedRole !== null;
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-workspace-background to-workspace-secondary/10">
@@ -37,7 +21,7 @@ const Index = () => {
           <div className="flex justify-center gap-4 pt-4">
             <Button 
               className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg"
-              onClick={() => setShowRoleSelector(true)}
+              onClick={() => navigate("/login")}
             >
               Get Started
             </Button>
@@ -47,32 +31,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      <RoleSelector
-        open={showRoleSelector}
-        onClose={() => setShowRoleSelector(false)}
-        onRoleSelect={handleRoleSelect}
-      />
-
-      {/* Modules Section - Only shown after selecting role */}
-      {showModules && (
-        <section className="container mx-auto py-16 px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {(selectedRole.module === "workcard" || selectedRole.module === "both") && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-workspace-primary mb-6">Work Card Generator</h2>
-                <WorkCardForm />
-              </div>
-            )}
-            {(selectedRole.module === "compliance" || selectedRole.module === "both") && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-workspace-primary mb-6">Compliance Management</h2>
-                <ComplianceManagement />
-              </div>
-            )}
-          </div>
-        </section>
-      )}
 
       {/* Key Features Section */}
       <section className="container mx-auto py-16 px-4">
@@ -151,7 +109,10 @@ const Index = () => {
           <p className="text-lg text-workspace-text/80">
             Join the future of aerospace maintenance with AI AeroGuardian
           </p>
-          <Button className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg mt-6">
+          <Button 
+            className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg mt-6"
+            onClick={() => navigate("/login")}
+          >
             Contact Sales
           </Button>
         </div>

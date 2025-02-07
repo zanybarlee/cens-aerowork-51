@@ -3,6 +3,7 @@ import React from "react";
 import { AircraftSelector } from "@/components/AircraftSelector";
 import { WorkCardForm } from "@/components/WorkCardForm";
 import { MainDashboard } from "@/components/MainDashboard";
+import { ComplianceManagement } from "@/components/ComplianceManagement";
 
 const Index = () => {
   const handleAircraftSelect = (model: string) => {
@@ -21,7 +22,7 @@ const Index = () => {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="space-y-8">
             <AircraftSelector onSelect={handleAircraftSelect} />
             <WorkCardForm />
@@ -29,6 +30,10 @@ const Index = () => {
           <div className="space-y-8">
             <MainDashboard />
           </div>
+        </div>
+
+        <div className="mt-8">
+          <ComplianceManagement />
         </div>
       </div>
     </div>

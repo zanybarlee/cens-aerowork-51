@@ -95,7 +95,7 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
                   View Details
                 </Button>
                 {userRole === 'maintenance-planner' && card.status !== 'scheduled' && (
-                  <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                  <Dialog open={isDialogOpen && selectedCardId === card.id} onOpenChange={(open) => {
                     setIsDialogOpen(open);
                     if (open) {
                       setSelectedCardId(card.id);
@@ -183,3 +183,4 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
     </div>
   );
 }
+

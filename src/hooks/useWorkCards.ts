@@ -54,7 +54,7 @@ export const useWorkCards = (userRole: string) => {
       if (card.id === cardId) {
         return {
           ...card,
-          status: 'scheduled' as const,
+          status: 'scheduled',
           scheduledDate,
           scheduledLocation,
           assignedTechnician,
@@ -80,3 +80,4 @@ export const useWorkCards = (userRole: string) => {
     scheduleWorkCard
   };
 };
+

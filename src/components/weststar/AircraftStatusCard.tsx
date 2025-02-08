@@ -18,8 +18,8 @@ export function AircraftStatusCard({ aircraft, onClick }: AircraftStatusCardProp
         <CardTitle className="text-lg font-semibold">Aircraft Status</CardTitle>
         <div className="w-full h-48 relative overflow-hidden rounded-md">
           <img
-            src="/aw139-helicopter.jpg"
-            alt="AW139 Helicopter"
+            src="/lovable-uploads/36b9c401-32b5-4f4b-8860-c312c38910ec.png"
+            alt="AW139 Military Helicopter"
             className="object-cover w-full h-full"
             onError={(e) => {
               const target = e.target as HTMLImageElement;

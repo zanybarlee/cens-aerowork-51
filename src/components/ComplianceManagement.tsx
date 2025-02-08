@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,68 +22,83 @@ interface ComplianceManagementProps {
   };
 }
 
+const INITIAL_DIRECTIVES: ComplianceDirective[] = [
+  {
+    id: "CAAM-2025-01",
+    type: "AD",
+    reference: "CAAM/AD/TRG-2025-01",
+    issuingBody: "CAAM",
+    applicableModels: ["AW139"],
+    title: "Tail Rotor Gearbox Inspection",
+    description: "Mandatory inspection of tail rotor gearbox for AW139 helicopters with flight hours between 3,500-3,600. Inspection must be performed within 100 flight hours from current status.\n\n**OEM Requirements:**\n- Visual inspection for corrosion\n- Torque checks on all mounting bolts\n- Magnetic particle inspection of critical areas\n- Lubrication system integrity check",
+    effectiveDate: "2025-04-15",
+    status: "open",
+    priority: "high",
+    deadline: "2025-05-15"
+  },
+  {
+    id: "SB-407-24-01",
+    type: "SB",
+    reference: "SB 407-24-01",
+    issuingBody: "Leonardo",
+    applicableModels: ["AW139", "AW169"],
+    title: "Engine Control Unit Update",
+    description: "Software update for enhanced engine control system",
+    effectiveDate: "2024-02-01",
+    status: "closed",
+    priority: "medium",
+    deadline: "2024-06-15"
+  },
+  {
+    id: "CAAM-2024-02",
+    type: "AD",
+    reference: "CAAM/AD/TRG-2024-02",
+    issuingBody: "CAAM",
+    applicableModels: ["AW139"],
+    title: "Tail Rotor Drive Shaft Inspection",
+    description: "Inspection of tail rotor drive shaft for wear patterns",
+    effectiveDate: "2024-03-01",
+    status: "open",
+    priority: "high",
+    deadline: "2024-04-30"
+  }
+];
+
 export function ComplianceManagement({ userRole, aircraft }: ComplianceManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewDirectiveModalOpen, setIsNewDirectiveModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
   const [showNewDirectiveAlert, setShowNewDirectiveAlert] = useState(false);
-  const [directives, setDirectives] = useState<ComplianceDirective[]>([
-    {
-      id: "CAAM-2025-01",
-      type: "AD",
-      reference: "CAAM/AD/TRG-2025-01",
-      issuingBody: "CAAM",
-      applicableModels: ["AW139"],
-      title: "Tail Rotor Gearbox Inspection",
-      description: "Mandatory inspection of tail rotor gearbox for AW139 helicopters with flight hours between 3,500-3,600. Inspection must be performed within 100 flight hours from current status.\n\n**OEM Requirements:**\n- Visual inspection for corrosion\n- Torque checks on all mounting bolts\n- Magnetic particle inspection of critical areas\n- Lubrication system integrity check",
-      effectiveDate: "2025-04-15",
-      status: "open",
-      priority: "high",
-      deadline: "2025-05-15"
-    },
-    {
-      id: "SB-407-24-01",
-      type: "SB",
-      reference: "SB 407-24-01",
-      issuingBody: "Leonardo",
-      applicableModels: ["AW139", "AW169"],
-      title: "Engine Control Unit Update",
-      description: "Software update for enhanced engine control system",
-      effectiveDate: "2024-02-01",
-      status: "closed",
-      priority: "medium",
-      deadline: "2024-06-15"
-    },
-    {
-      id: "CAAM-2024-02",
-      type: "AD",
-      reference: "CAAM/AD/TRG-2024-02",
-      issuingBody: "CAAM",
-      applicableModels: ["AW139"],
-      title: "Tail Rotor Drive Shaft Inspection",
-      description: "Inspection of tail rotor drive shaft for wear patterns",
-      effectiveDate: "2024-03-01",
-      status: "open",
-      priority: "high",
-      deadline: "2024-04-30"
-    }
-  ]);
+  const [directives, setDirectives] = useState<ComplianceDirective[]>(() => {
+    const savedDirectives = localStorage.getItem('complianceDirectives');
+    return savedDirectives ? JSON.parse(savedDirectives) : INITIAL_DIRECTIVES;
+  });
   const { toast } = useToast();
+
+  // Save directives to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('complianceDirectives', JSON.stringify(directives));
+  }, [directives]);
 
   useEffect(() => {
     const handleComplianceUpdate = (event: CustomEvent) => {
       const { reference, status, completionDetails } = event.detail;
-      setDirectives(prev => prev.map(directive => {
-        if (directive.reference === reference) {
-          return {
-            ...directive,
-            status,
-            completionDetails
-          };
-        }
-        return directive;
-      }));
+      setDirectives(prev => {
+        const newDirectives = prev.map(directive => {
+          if (directive.reference === reference) {
+            return {
+              ...directive,
+              status,
+              completionDetails
+            };
+          }
+          return directive;
+        });
+        // Save to localStorage after update
+        localStorage.setItem('complianceDirectives', JSON.stringify(newDirectives));
+        return newDirectives;
+      });
     };
 
     window.addEventListener('updateComplianceStatus', handleComplianceUpdate as EventListener);
@@ -156,11 +172,16 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
         deadline: formData.deadline,
       };
 
-      setDirectives(prev => [newDirective, ...prev]);
+      setDirectives(prev => {
+        const newDirectives = [newDirective, ...prev];
+        localStorage.setItem('complianceDirectives', JSON.stringify(newDirectives));
+        return newDirectives;
+      });
+      
       setIsNewDirectiveModalOpen(false);
       toast({
         title: "Success",
-        description: "New directive has been added successfully",
+        description: "New directive has been added and saved successfully",
       });
     } catch (error) {
       toast({
@@ -223,3 +244,4 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     </>
   );
 }
+

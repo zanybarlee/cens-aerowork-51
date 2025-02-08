@@ -48,7 +48,7 @@ export function WorkCardInputForm({ onSubmit, isLoading, aircraft }: WorkCardInp
 
       <EnvironmentInput
         value={environment}
-        onChange={(e) => setEnvironment(e.target.value)}
+        onChange={setEnvironment}
       />
 
       <Button 

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 
 interface EnvironmentInputProps {
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement> | string) => void;
+  onChange: (value: string) => void;
 }
 
 const environmentPresets = [
@@ -29,17 +29,7 @@ export function EnvironmentInput({ value, onChange }: EnvironmentInputProps) {
       <Label htmlFor="environment">Operating Environment</Label>
       <Select
         value={value}
-        onValueChange={(newValue) => {
-          if (typeof onChange === 'function') {
-            // If it's the event handler style
-            if ('target' in onChange) {
-              onChange({ target: { value: newValue } } as React.ChangeEvent<HTMLInputElement>);
-            } else {
-              // If it's the direct value style
-              onChange(newValue);
-            }
-          }
-        }}
+        onValueChange={onChange}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select operating environment" />

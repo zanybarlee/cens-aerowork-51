@@ -9,6 +9,14 @@ export interface StoredWorkCard {
   environment: string;
   date: string;
   role: string;
+  status?: 'draft' | 'scheduled';
+  scheduledDate?: string;
+  scheduledLocation?: string;
+  assignedTechnician?: string;
+  requiredParts?: {
+    partNumber: string;
+    quantity: number;
+  }[];
 }
 
 export interface WorkCardFormProps {

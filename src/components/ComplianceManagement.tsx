@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -131,20 +132,29 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
   };
 
   const handleGenerateWorkCard = (directive: ComplianceDirective) => {
-    // Find the Work Card Generator section in the DOM
-    const workCardGenerator = document.querySelector('[data-section="work-card-generator"]');
-    if (workCardGenerator) {
-      workCardGenerator.scrollIntoView({ behavior: 'smooth' });
-      
-      // Pre-fill the work card form with directive details
-      if (aircraft) {
-        toast({
-          title: "Work Card Generation",
-          description: "Work card form has been pre-filled with compliance directive details.",
-        });
-      }
-    }
+    // Dispatch a custom event with the directive details
+    const event = new CustomEvent('generateWorkCard', { 
+      detail: { 
+        flightHours: aircraft?.flightHours.toString() || '',
+        cycles: aircraft?.cycles.toString() || '',
+        environment: aircraft?.environment || '',
+        directive: directive
+      } 
+    });
+    window.dispatchEvent(event);
+    
+    toast({
+      title: "Work Card Generation",
+      description: "Work card form has been pre-filled with directive details.",
+    });
+    
     setIsModalOpen(false);
+
+    // Scroll to work card section
+    const workCardSection = document.getElementById('work-card-section');
+    if (workCardSection) {
+      workCardSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const filteredDirectives = filterDirectives(complianceDirectives);

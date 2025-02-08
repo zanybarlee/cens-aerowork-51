@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkCardInputForm } from "./WorkCardGenerator/WorkCardInputForm";
 import { useWorkCardGeneration } from "@/hooks/useWorkCardGeneration";
@@ -8,7 +8,7 @@ import { WorkCardDetails } from "./WorkCardGenerator/WorkCardDetails";
 import { useWorkCards } from "@/hooks/useWorkCards";
 import { v4 as uuidv4 } from 'uuid';
 import { StoredWorkCardsTable } from "./WorkCardGenerator/StoredWorkCardsTable";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const { workCard, isLoading, generateWorkCard } = useWorkCardGeneration(aircraft);
@@ -17,6 +17,19 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const [selectedContent, setSelectedContent] = useState<string>("");
   const [selectedCard, setSelectedCard] = useState<StoredWorkCard | undefined>();
   const { toast } = useToast();
+
+  // Listen for work card generation events
+  useEffect(() => {
+    const handleWorkCardGeneration = async (event: CustomEvent) => {
+      const { flightHours, cycles, environment, directive } = event.detail;
+      await handleSubmit(flightHours, cycles, environment);
+    };
+
+    window.addEventListener('generateWorkCard', handleWorkCardGeneration as EventListener);
+    return () => {
+      window.removeEventListener('generateWorkCard', handleWorkCardGeneration as EventListener);
+    };
+  }, []);
 
   const handleSubmit = async (flightHours: string, cycles: string, environment: string) => {
     const generatedCard = await generateWorkCard(flightHours, cycles, environment);
@@ -76,7 +89,7 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" id="work-card-section">
       <CardHeader>
         <CardTitle>Work Card Generator</CardTitle>
       </CardHeader>

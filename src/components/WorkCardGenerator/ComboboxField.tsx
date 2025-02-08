@@ -26,6 +26,8 @@ export function ComboboxField({
   setOpen,
   placeholder,
 }: ComboboxFieldProps) {
+  const [inputValue, setInputValue] = React.useState("");
+
   const getDisplayValue = () => {
     const selectedOption = options.find(opt => opt.value === value);
     return selectedOption ? selectedOption.label : value || placeholder;
@@ -35,8 +37,10 @@ export function ComboboxField({
     const selectedOption = options.find(opt => opt.value === currentValue);
     if (selectedOption) {
       onChange(selectedOption.value);
-      setOpen(false);
+    } else {
+      onChange(currentValue);
     }
+    setOpen(false);
   };
 
   return (
@@ -58,10 +62,10 @@ export function ComboboxField({
           <Command>
             <CommandInput 
               placeholder={`Search or enter custom ${label.toLowerCase()}...`}
+              value={inputValue}
               onValueChange={(search) => {
-                if (!options.some(opt => opt.value === search || opt.label === search)) {
-                  onChange(search);
-                }
+                setInputValue(search);
+                onChange(search);
               }}
             />
             <CommandList>

@@ -8,18 +8,20 @@ import { WorkCardDetails } from "./WorkCardGenerator/WorkCardDetails";
 import { useWorkCards } from "@/hooks/useWorkCards";
 import { v4 as uuidv4 } from 'uuid';
 import { StoredWorkCardsTable } from "./WorkCardGenerator/StoredWorkCardsTable";
+import { useToast } from "@/components/ui/use-toast";
 
 export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const { workCard, isLoading, generateWorkCard } = useWorkCardGeneration(aircraft);
-  const { addWorkCard, storedWorkCards, deleteWorkCard } = useWorkCards(userRole);
+  const { addWorkCard, storedWorkCards, deleteWorkCard, scheduleWorkCard } = useWorkCards(userRole);
   const [showModal, setShowModal] = useState(false);
   const [selectedContent, setSelectedContent] = useState<string>("");
+  const [selectedCard, setSelectedCard] = useState<StoredWorkCard | undefined>();
+  const { toast } = useToast();
 
   const handleSubmit = async (flightHours: string, cycles: string, environment: string) => {
     const generatedCard = await generateWorkCard(flightHours, cycles, environment);
     if (generatedCard) {
-      // Store the work card
-      addWorkCard({
+      const newCard = {
         id: uuidv4(),
         content: generatedCard,
         flightHours,
@@ -28,32 +30,40 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
         date: new Date().toLocaleDateString(),
         role: userRole,
         status: 'draft'
-      });
+      };
+      addWorkCard(newCard);
+      setSelectedCard(newCard);
       setSelectedContent(generatedCard);
       setShowModal(true);
     }
   };
 
-  const handleSchedule = (cardId: string, scheduledDate: string, scheduledLocation: string, assignedTechnician: string, requiredParts: { partNumber: string; quantity: number }[]) => {
-    const updatedCards = storedWorkCards.map(card => {
-      if (card.id === cardId) {
-        return {
-          ...card,
-          status: 'scheduled' as const,
-          scheduledDate,
-          scheduledLocation,
-          assignedTechnician,
-          requiredParts
-        };
-      }
-      return card;
-    });
-    localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedCards));
+  const handleViewDetails = (card: StoredWorkCard) => {
+    setSelectedCard(card);
+    setSelectedContent(card.content);
+    setShowModal(true);
   };
 
-  const handleViewDetails = (content: string) => {
-    setSelectedContent(content);
-    setShowModal(true);
+  const handleComplete = (taskResults: string, remarks: string) => {
+    if (selectedCard) {
+      const updatedCard = {
+        ...selectedCard,
+        status: 'completed' as const,
+        taskResults,
+        completionRemarks: remarks,
+        completedBy: userRole,
+        completionDate: new Date().toLocaleDateString()
+      };
+      addWorkCard(updatedCard);
+
+      toast({
+        title: "Work Card Completed",
+        description: "The work card has been marked as completed and compliance records have been updated.",
+      });
+
+      // Close the modal
+      setShowModal(false);
+    }
   };
 
   return (
@@ -72,14 +82,17 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
           workCards={storedWorkCards}
           onDelete={deleteWorkCard}
           onViewDetails={handleViewDetails}
-          onSchedule={handleSchedule}
+          onSchedule={scheduleWorkCard}
           userRole={userRole}
         />
 
         <WorkCardDetails
           isOpen={showModal}
           onOpenChange={setShowModal}
-          content={selectedContent || workCard || ""}
+          content={selectedContent}
+          workCard={selectedCard}
+          userRole={userRole}
+          onComplete={handleComplete}
         />
       </CardContent>
     </Card>

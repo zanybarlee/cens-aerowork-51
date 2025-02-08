@@ -21,7 +21,6 @@ export const useWorkCards = (userRole: string) => {
   
   const { toast } = useToast();
 
-  // Single effect to handle all refresh logic
   useEffect(() => {
     const refreshData = () => {
       const plannerCards = localStorage.getItem("workCards_maintenance-planner");
@@ -40,24 +39,34 @@ export const useWorkCards = (userRole: string) => {
       }
     };
 
-    // Initial refresh
     refreshData();
-
-    // Set up interval for periodic refresh
     const refreshInterval = setInterval(refreshData, 1000);
-    
     return () => clearInterval(refreshInterval);
   }, [userRole]);
 
   const addWorkCard = (newWorkCard: StoredWorkCard) => {
-    const updatedWorkCards = [newWorkCard, ...storedWorkCards];
+    const updatedWorkCards = storedWorkCards.map(card => 
+      card.id === newWorkCard.id ? newWorkCard : card
+    );
+
+    if (!updatedWorkCards.find(card => card.id === newWorkCard.id)) {
+      updatedWorkCards.unshift(newWorkCard);
+    }
+
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
     
-    toast({
-      title: "Work Card Generated",
-      description: "The work card has been generated and stored successfully.",
-    });
+    if (newWorkCard.status === 'completed') {
+      // Update both planner and technician storage for completed cards
+      const plannerCards = localStorage.getItem("workCards_maintenance-planner");
+      if (plannerCards) {
+        const plannerData = JSON.parse(plannerCards);
+        const updatedPlannerCards = plannerData.map((card: StoredWorkCard) =>
+          card.id === newWorkCard.id ? newWorkCard : card
+        );
+        localStorage.setItem("workCards_maintenance-planner", JSON.stringify(updatedPlannerCards));
+      }
+    }
   };
 
   const deleteWorkCard = (id: string) => {

@@ -6,12 +6,15 @@ export interface Aircraft {
   cycles: number;
   environment: string;
   lastInspectionDate?: string;
+  nextInspectionDue?: string;
 }
 
 export interface ComplianceDirective {
   id: string;
   type: 'AD' | 'SB';
   reference: string;
+  issuingBody: string;
+  applicableModels: string[];
   title: string;
   description: string;
   effectiveDate: string;
@@ -39,10 +42,24 @@ export interface MaintenanceTask {
 export interface WorkCard {
   id: string;
   taskId: string;
+  aircraft: string;
   title: string;
   steps: string[];
-  partsRequired: string[];
+  priority: 'high' | 'medium' | 'low';
+  partsRequired: {
+    partNumber: string;
+    description: string;
+    quantity: number;
+  }[];
   laborHours: number;
   createdAt: string;
   status: 'draft' | 'active' | 'completed';
+}
+
+export interface InventoryPart {
+  partNumber: string;
+  description: string;
+  stockQuantity: number;
+  leadTimeDays: number;
+  costUSD: number;
 }

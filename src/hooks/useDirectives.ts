@@ -52,34 +52,10 @@ export const useDirectives = () => {
   });
   const { toast } = useToast();
 
+  // Save to localStorage whenever directives change
   useEffect(() => {
     localStorage.setItem('complianceDirectives', JSON.stringify(directives));
   }, [directives]);
-
-  useEffect(() => {
-    const handleComplianceUpdate = (event: CustomEvent) => {
-      const { reference, status, completionDetails } = event.detail;
-      setDirectives(prev => {
-        const newDirectives = prev.map(directive => {
-          if (directive.reference === reference) {
-            return {
-              ...directive,
-              status,
-              completionDetails
-            };
-          }
-          return directive;
-        });
-        localStorage.setItem('complianceDirectives', JSON.stringify(newDirectives));
-        return newDirectives;
-      });
-    };
-
-    window.addEventListener('updateComplianceStatus', handleComplianceUpdate as EventListener);
-    return () => {
-      window.removeEventListener('updateComplianceStatus', handleComplianceUpdate as EventListener);
-    };
-  }, []);
 
   const addDirective = async (formData: {
     reference: string;
@@ -90,36 +66,64 @@ export const useDirectives = () => {
     priority: 'high' | 'medium' | 'low';
     deadline: string;
   }) => {
-    const newDirective: ComplianceDirective = {
-      id: `DIR-${Math.random().toString(36).substr(2, 9)}`,
-      type: formData.type,
-      reference: formData.reference,
-      issuingBody: formData.issuingBody,
-      applicableModels: ["AW139"],
-      title: formData.title,
-      description: formData.description,
-      effectiveDate: new Date().toISOString().split('T')[0],
-      status: "open",
-      priority: formData.priority,
-      deadline: formData.deadline,
-    };
+    try {
+      const newDirective: ComplianceDirective = {
+        id: `DIR-${Math.random().toString(36).substr(2, 9)}`,
+        type: formData.type,
+        reference: formData.reference,
+        issuingBody: formData.issuingBody,
+        applicableModels: ["AW139"],
+        title: formData.title,
+        description: formData.description,
+        effectiveDate: new Date().toISOString().split('T')[0],
+        status: "open",
+        priority: formData.priority,
+        deadline: formData.deadline,
+      };
 
+      // Update state with the new directive
+      const updatedDirectives = [newDirective, ...directives];
+      setDirectives(updatedDirectives);
+      
+      // Explicitly save to localStorage
+      localStorage.setItem('complianceDirectives', JSON.stringify(updatedDirectives));
+
+      toast({
+        title: "Success",
+        description: "New directive has been added and saved successfully",
+      });
+
+      return newDirective;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to add new directive",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const updateComplianceStatus = (reference: string, status: string, completionDetails?: any) => {
     setDirectives(prev => {
-      const newDirectives = [newDirective, ...prev];
-      localStorage.setItem('complianceDirectives', JSON.stringify(newDirectives));
-      return newDirectives;
+      const updated = prev.map(directive => {
+        if (directive.reference === reference) {
+          return {
+            ...directive,
+            status,
+            completionDetails
+          };
+        }
+        return directive;
+      });
+      localStorage.setItem('complianceDirectives', JSON.stringify(updated));
+      return updated;
     });
-
-    toast({
-      title: "Success",
-      description: "New directive has been added and saved successfully",
-    });
-
-    return newDirective;
   };
 
   return {
     directives,
-    addDirective
+    addDirective,
+    updateComplianceStatus
   };
 };

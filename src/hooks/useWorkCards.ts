@@ -91,9 +91,13 @@ export const useWorkCards = (userRole: string) => {
       setStoredWorkCards([...updatedWorkCards]);
     }, 100);
     
+    const isUpdate = storedWorkCards.find(card => card.id === cardId)?.status === 'scheduled';
+    
     toast({
-      title: "Work Card Scheduled",
-      description: "The work card has been scheduled successfully.",
+      title: isUpdate ? "Work Card Updated" : "Work Card Scheduled",
+      description: isUpdate 
+        ? "The work card schedule has been updated successfully."
+        : "The work card has been scheduled successfully.",
     });
   };
 

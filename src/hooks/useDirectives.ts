@@ -104,7 +104,11 @@ export const useDirectives = () => {
     }
   };
 
-  const updateComplianceStatus = (reference: string, status: string, completionDetails?: any) => {
+  const updateComplianceStatus = (
+    reference: string, 
+    status: 'open' | 'closed' | 'not-applicable',
+    completionDetails?: ComplianceDirective['completionDetails']
+  ) => {
     setDirectives(prev => {
       const updated = prev.map(directive => {
         if (directive.reference === reference) {

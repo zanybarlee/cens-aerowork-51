@@ -57,6 +57,7 @@ export function ScheduleDialog({
         schedulingData.assignedTechnician,
         [{ partNumber: schedulingData.partNumber, quantity: Number(schedulingData.quantity) }]
       );
+      onOpenChange(false); // Close the dialog after scheduling
     }
   };
 

@@ -44,30 +44,17 @@ Please include:
 5. Quality assurance checkpoints`;
   };
 
-  async function query(data: { question: string }) {
-    const response = await fetch(
-      "http://127.0.0.1:3000/api/v1/prediction/7f8cd391-aa9d-417e-bf62-9f468fda4622",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-    const result = await response.json();
-    return result.text;
-  }
-
   const generateWorkCard = async (flightHours: string, cycles: string, environment: string) => {
     setIsLoading(true);
     setWorkCard("");
 
     try {
-      const prompt = generatePrompt(flightHours, cycles, environment);
-      const response = await query({ question: prompt });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const formattedResponse = `# Work Card - ${aircraft?.tailNumber}
+      const prompt = generatePrompt(flightHours, cycles, environment);
+      // Mock response
+      const mockResponse = `# Work Card - ${aircraft?.tailNumber}
 Generated on: ${new Date().toLocaleDateString()}
 
 ${parseInt(flightHours) >= 3500 && parseInt(flightHours) <= 3600 ? 
@@ -77,18 +64,50 @@ ${parseInt(flightHours) >= 3500 && parseInt(flightHours) <= 3600 ?
 - Must be completed before 3,600 flight hours
 
 ` : ''}
-${response}
 
-## Completion Status
-| Task | Status | Technician | Remarks |
-|------|---------|------------|---------|
-| Remove tail rotor fairing | ⏳ Pending | - | - |
-| Drain gearbox oil, check for particles | ⏳ Pending | - | - |
-| Inspect gearbox housing | ⏳ Pending | - | - |
-| Replace/refill oil (P/N AW139-GB-OIL10) | ⏳ Pending | - | - |
-| Reinstall fairing, test run | ⏳ Pending | - | - |
+## Task Overview
+- Aircraft: ${aircraft?.tailNumber} (AW139)
+- Flight Hours: ${flightHours}
+- Cycles: ${cycles}
+- Environment: ${environment}
 
-## Quality Assurance
+## Safety Precautions
+1. Ensure aircraft is properly grounded
+2. Display "Maintenance in Progress" signs
+3. Required PPE:
+   - Safety glasses
+   - Work gloves
+   - Steel-toed boots
+   - High-visibility vest
+
+## Required Parts and Tools
+1. Parts:
+   - Gearbox oil (P/N: AW139-GB-OIL10)
+   - Gasket set (P/N: AW139-GSKT-TR)
+2. Tools:
+   - Torque wrench set
+   - Oil drain pan
+   - Inspection mirror
+   - Borescope (if required)
+
+## Step-by-Step Procedures
+1. Initial Setup (2 hours)
+   - Position aircraft in maintenance area
+   - Install safety barriers
+   - Connect ground power
+   
+2. Inspection Tasks (4 hours)
+   - Remove access panels
+   - Conduct visual inspection
+   - Check oil levels
+   - Inspect mounting bolts
+   
+3. Completion (2 hours)
+   - Reinstall panels
+   - System test
+   - Documentation
+
+## Quality Checks
 - All work must be documented in the aircraft technical log
 - Any discrepancies must be reported to the maintenance supervisor
 - Final inspection required before return to service
@@ -108,9 +127,9 @@ ${parseInt(flightHours) >= 3500 && parseInt(flightHours) <= 3600 ?
 Technician ID: _____________
 Date: _____________
 Time: _____________`;
-
-      setWorkCard(formattedResponse);
-      return formattedResponse;
+      
+      setWorkCard(mockResponse);
+      return mockResponse;
     } catch (error) {
       toast({
         title: "Error",

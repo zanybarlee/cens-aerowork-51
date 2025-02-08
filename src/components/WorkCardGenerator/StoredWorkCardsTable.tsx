@@ -104,7 +104,7 @@ export function StoredWorkCardsTable({
               userRole={userRole}
               onRowClick={handleRowClick}
               onDelete={onDelete}
-              onViewDetails={onViewDetails}
+              onViewDetails={(card: StoredWorkCard) => onViewDetails(card.content)}
             />
           ))}
         </TableBody>

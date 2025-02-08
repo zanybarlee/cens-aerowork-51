@@ -14,7 +14,7 @@ import { useWorkCards } from "@/hooks/useWorkCards";
 import { WorkCardInputForm } from "./WorkCardGenerator/WorkCardInputForm";
 import { StoredWorkCardsTable } from "./WorkCardGenerator/StoredWorkCardsTable";
 
-export function WorkCardForm({ userRole }: WorkCardFormProps) {
+export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const [workCard, setWorkCard] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -27,7 +27,7 @@ export function WorkCardForm({ userRole }: WorkCardFormProps) {
 
   async function query(data: { question: string }) {
     const response = await fetch(
-      "http://127.0.0.1:3000/api/v1/prediction/7f8cd391-aa9d-417e-bf62-9f468fda4422",
+      "http://127.0.0.1:3000/api/v1/prediction/7f8cd391-aa9d-417e-bf62-9f468fda4622",
       {
         method: "POST",
         headers: {
@@ -87,7 +87,11 @@ export function WorkCardForm({ userRole }: WorkCardFormProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <WorkCardInputForm onSubmit={handleSubmit} isLoading={isLoading} />
+          <WorkCardInputForm 
+            onSubmit={handleSubmit} 
+            isLoading={isLoading} 
+            aircraft={aircraft}
+          />
         </CardContent>
       </Card>
 

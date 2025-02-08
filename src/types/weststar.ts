@@ -5,6 +5,7 @@ export interface Aircraft {
   flightHours: number;
   cycles: number;
   environment: string;
+  lastInspectionDate?: string;
 }
 
 export interface ComplianceDirective {

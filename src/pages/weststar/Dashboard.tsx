@@ -14,7 +14,8 @@ export default function WeststarDashboard() {
     model: "AW139",
     flightHours: 3500,
     cycles: 1200,
-    environment: "offshore"
+    environment: "offshore",
+    lastInspectionDate: "2025-01-12"
   };
 
   return (
@@ -35,6 +36,11 @@ export default function WeststarDashboard() {
               <p className="text-sm text-muted-foreground">Flight Hours: {aircraft.flightHours}</p>
               <p className="text-sm text-muted-foreground">Cycles: {aircraft.cycles}</p>
               <p className="text-sm text-muted-foreground">Environment: {aircraft.environment}</p>
+              {aircraft.lastInspectionDate && (
+                <p className="text-sm text-muted-foreground">
+                  Last Inspection: {new Date(aircraft.lastInspectionDate).toLocaleDateString()}
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -44,7 +50,7 @@ export default function WeststarDashboard() {
 
       <div className="space-y-6">
         <ComplianceManagement userRole={selectedRole} aircraft={aircraft} />
-        <WorkCardForm userRole={selectedRole} />
+        <WorkCardForm userRole={selectedRole} aircraft={aircraft} />
       </div>
     </div>
   );

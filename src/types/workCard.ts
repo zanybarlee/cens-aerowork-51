@@ -1,4 +1,6 @@
 
+import { Aircraft } from "./weststar";
+
 export interface StoredWorkCard {
   id: string;
   content: string;
@@ -11,4 +13,5 @@ export interface StoredWorkCard {
 
 export interface WorkCardFormProps {
   userRole: string;
+  aircraft: Aircraft;
 }

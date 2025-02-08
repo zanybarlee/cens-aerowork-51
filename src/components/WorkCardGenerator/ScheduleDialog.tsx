@@ -10,32 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StoredWorkCard } from "@/types/workCard";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-// Preset options
-const locationPresets = [
-  { value: "subang-hq-bay1", label: "Subang HQ – Bay 1" },
-  { value: "subang-hq-bay2", label: "Subang HQ – Bay 2" },
-  { value: "kota-kinabalu-hangar", label: "Kota Kinabalu Hangar" },
-  { value: "miri-facility", label: "Miri Facility" },
-];
-
-const technicianPresets = [
-  { value: "tech-001", label: "Tech ID: 001 - John Smith" },
-  { value: "tech-002", label: "Tech ID: 002 - Jane Doe" },
-  { value: "tech-003", label: "Tech ID: 003 - Mike Johnson" },
-  { value: "tech-007", label: "Tech ID: 007 - Robert Wilson" },
-];
-
-const partPresets = [
-  { value: "AW139-GSKT-TR", label: "AW139-GSKT-TR - Tail Rotor Gasket" },
-  { value: "AW139-BRK-MN", label: "AW139-BRK-MN - Main Brake Assembly" },
-  { value: "AW139-FLT-OIL", label: "AW139-FLT-OIL - Oil Filter" },
-  { value: "AW139-BLD-SET", label: "AW139-BLD-SET - Main Rotor Blade Set" },
-];
+import { ComboboxField } from "./ComboboxField";
+import { locationPresets, technicianPresets, partPresets } from "./schedulePresets";
 
 interface ScheduleDialogProps {
   isOpen: boolean;
@@ -89,79 +65,6 @@ export function ScheduleDialog({
       );
       onOpenChange(false);
     }
-  };
-
-  const ComboboxField = ({ 
-    label, 
-    value, 
-    onChange, 
-    options, 
-    open, 
-    setOpen, 
-    placeholder 
-  }: { 
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    options: { value: string; label: string; }[];
-    open: boolean;
-    setOpen: (open: boolean) => void;
-    placeholder: string;
-  }) => {
-    const getDisplayValue = () => {
-      if (!value) return placeholder;
-      const option = options.find(opt => opt.value === value || opt.label === value);
-      return option ? option.label : value;
-    };
-
-    return (
-      <div className="space-y-2">
-        <Label>{label}</Label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              aria-expanded={open}
-              className="w-full justify-between"
-            >
-              {getDisplayValue()}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-full p-0">
-            <Command>
-              <CommandInput 
-                placeholder={`Search or enter custom ${label.toLowerCase()}...`}
-              />
-              <CommandList>
-                <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
-                <CommandGroup heading={`Preset ${label}s`}>
-                  {options.map((option) => (
-                    <CommandItem
-                      key={option.value}
-                      value={option.value}
-                      onSelect={() => {
-                        onChange(option.value);
-                        setOpen(false);
-                      }}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === option.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {option.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
   };
 
   return (

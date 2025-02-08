@@ -6,12 +6,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, MessageSquare, Signature } from "lucide-react";
+import { CheckCircle2, MessageSquare, Signature, Shield } from "lucide-react";
 import { StoredWorkCard } from "@/types/workCard";
 
 interface WorkCardDetailsProps {
@@ -20,7 +21,7 @@ interface WorkCardDetailsProps {
   content: string;
   workCard?: StoredWorkCard;
   userRole?: string;
-  onComplete?: (results: string, remarks: string) => void;
+  onComplete?: (results: string, remarks: string, signature: string) => void;
 }
 
 export function WorkCardDetails({ 
@@ -33,11 +34,21 @@ export function WorkCardDetails({
 }: WorkCardDetailsProps) {
   const [taskResults, setTaskResults] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [signature, setSignature] = useState("");
+  const [showSignatureError, setShowSignatureError] = useState(false);
 
   const handleComplete = () => {
+    if (!signature.trim()) {
+      setShowSignatureError(true);
+      return;
+    }
+    
     if (onComplete) {
-      onComplete(taskResults, remarks);
-      onOpenChange(false);
+      onComplete(taskResults, remarks, signature);
+      setTaskResults("");
+      setRemarks("");
+      setSignature("");
+      setShowSignatureError(false);
     }
   };
 
@@ -49,6 +60,9 @@ export function WorkCardDetails({
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Work Card Details</DialogTitle>
+          <DialogDescription>
+            Review and complete maintenance tasks
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
           <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-6 rounded-lg">
@@ -73,16 +87,36 @@ export function WorkCardDetails({
 
               <div className="space-y-2">
                 <Label htmlFor="remarks">
-                  <Signature className="w-4 h-4 inline mr-2" />
-                  Completion Remarks
+                  <Shield className="w-4 h-4 inline mr-2" />
+                  Completion Remarks & Compliance Notes
                 </Label>
                 <Textarea
                   id="remarks"
-                  placeholder="Enter any remarks or observations"
+                  placeholder="Enter any remarks, observations, or compliance-related notes"
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   className="min-h-[100px]"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="signature" className="flex items-center gap-2">
+                  <Signature className="w-4 h-4" />
+                  Electronic Signature
+                </Label>
+                <Input
+                  id="signature"
+                  placeholder="Enter your full name as electronic signature"
+                  value={signature}
+                  onChange={(e) => {
+                    setSignature(e.target.value);
+                    setShowSignatureError(false);
+                  }}
+                  className={showSignatureError ? "border-red-500" : ""}
+                />
+                {showSignatureError && (
+                  <p className="text-sm text-red-500">Electronic signature is required</p>
+                )}
               </div>
 
               <Button 
@@ -91,7 +125,7 @@ export function WorkCardDetails({
                 disabled={!taskResults.trim()}
               >
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Complete Work Card
+                Complete Work Card & Update Compliance
               </Button>
             </div>
           )}
@@ -107,8 +141,8 @@ export function WorkCardDetails({
                 <p className="mt-1 text-sm">{workCard.completionRemarks}</p>
               </div>
               <div>
-                <Label>Completed By</Label>
-                <p className="mt-1 text-sm">{workCard.completedBy}</p>
+                <Label>Electronic Signature</Label>
+                <p className="mt-1 text-sm font-medium">{workCard.completedBy}</p>
               </div>
               <div>
                 <Label>Completion Date</Label>

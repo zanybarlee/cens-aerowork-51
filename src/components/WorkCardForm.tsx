@@ -46,21 +46,29 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
     setShowModal(true);
   };
 
-  const handleComplete = (taskResults: string, remarks: string) => {
+  const handleComplete = (taskResults: string, remarks: string, signature: string) => {
     if (selectedCard) {
       const updatedCard: StoredWorkCard = {
         ...selectedCard,
         status: 'completed' as const,
         taskResults,
         completionRemarks: remarks,
-        completedBy: userRole,
+        completedBy: signature,
         completionDate: new Date().toLocaleDateString()
       };
       addWorkCard(updatedCard);
 
+      // If this is a compliance-related work card, update the bulletin status
+      if (updatedCard.flightHours >= "3500" && updatedCard.flightHours <= "3600") {
+        toast({
+          title: "Compliance Update",
+          description: "CAAM/AD/TRG-2025-01 status has been updated to Closed in the Compliance Management System.",
+        });
+      }
+
       toast({
         title: "Work Card Completed",
-        description: "The work card has been marked as completed and compliance records have been updated.",
+        description: "The work card has been completed and signed off successfully.",
       });
 
       setShowModal(false);

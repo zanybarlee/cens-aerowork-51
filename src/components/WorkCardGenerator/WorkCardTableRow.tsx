@@ -21,6 +21,25 @@ export function WorkCardTableRow({
   onDelete,
   onViewDetails,
 }: WorkCardTableRowProps) {
+  const getStatusBadge = () => {
+    switch (card.status) {
+      case 'completed':
+        return (
+          <Badge variant="success" className="bg-green-500">
+            Completed on {card.completionDate}
+          </Badge>
+        );
+      case 'scheduled':
+        return (
+          <Badge variant="default">
+            Scheduled: {new Date(card.scheduledDate!).toLocaleDateString()}
+          </Badge>
+        );
+      default:
+        return <Badge variant="secondary">Draft</Badge>;
+    }
+  };
+
   return (
     <TableRow
       className={userRole === 'maintenance-planner' ? 'cursor-pointer hover:bg-gray-50' : ''}
@@ -33,11 +52,7 @@ export function WorkCardTableRow({
       </TableCell>
       <TableCell>{card.flightHours}</TableCell>
       <TableCell>{card.cycles}</TableCell>
-      <TableCell>
-        <Badge variant={card.status === 'scheduled' ? 'default' : 'secondary'}>
-          {card.status === 'scheduled' ? `Scheduled: ${new Date(card.scheduledDate!).toLocaleDateString()}` : 'draft'}
-        </Badge>
-      </TableCell>
+      <TableCell>{getStatusBadge()}</TableCell>
       <TableCell className="text-right space-x-2">
         <Button
           variant="outline"

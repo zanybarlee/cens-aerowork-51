@@ -47,6 +47,7 @@ export default function WeststarDashboard() {
         return (
           <div className="space-y-6">
             <MaintenanceScheduler aircraft={aircraft} />
+            <WorkCardForm userRole={selectedRole} aircraft={aircraft} />
             <ComplianceManagement userRole={selectedRole} aircraft={aircraft} />
           </div>
         );
@@ -143,4 +144,3 @@ export default function WeststarDashboard() {
     </>
   );
 }
-

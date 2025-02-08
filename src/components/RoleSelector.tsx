@@ -19,7 +19,7 @@ export type UserRole = {
   module: "workcard" | "compliance" | "both";
 };
 
-const roles: UserRole[] = [
+export const roles: UserRole[] = [
   {
     id: "maintenance-planner",
     title: "Maintenance Planner",

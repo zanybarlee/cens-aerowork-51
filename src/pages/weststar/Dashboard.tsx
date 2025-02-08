@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,8 +8,8 @@ import { MaintenanceScheduler } from "@/components/MaintenanceScheduler";
 import { Aircraft } from "@/types/weststar";
 import { Calendar } from "@/components/ui/calendar";
 import { useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
-import { RoleSelector, UserRole } from "@/components/RoleSelector";
+import { LogOut, UserCircle } from "lucide-react";
+import { RoleSelector, UserRole, roles } from "@/components/RoleSelector";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +17,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function WeststarDashboard() {
   const [selectedRole, setSelectedRole] = useState<string>("planner");
   const [showRoleSelector, setShowRoleSelector] = useState(true);
   const [showAircraftDetails, setShowAircraftDetails] = useState(false);
+  const { toast } = useToast();
   const navigate = useNavigate();
   
   const aircraft: Aircraft = {
@@ -41,6 +42,10 @@ export default function WeststarDashboard() {
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role.id);
     setShowRoleSelector(false);
+    toast({
+      title: "Role Selected",
+      description: `You are now working as ${role.title}`,
+    });
   };
 
   const renderRoleSpecificContent = () => {
@@ -86,9 +91,19 @@ export default function WeststarDashboard() {
       
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-blue-900">
-            Weststar Aviation Services - AW139 Maintenance
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-blue-900">
+              Weststar Aviation Services - AW139 Maintenance
+            </h1>
+            {!showRoleSelector && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-md">
+                <UserCircle className="h-5 w-5 text-blue-900" />
+                <span className="text-blue-900 font-medium">
+                  {roles.find(r => r.id === selectedRole)?.title || "User"}
+                </span>
+              </div>
+            )}
+          </div>
           <Button 
             onClick={handleLogout}
             variant="outline"
@@ -220,4 +235,3 @@ export default function WeststarDashboard() {
     </>
   );
 }
-

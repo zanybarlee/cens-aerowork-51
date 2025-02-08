@@ -52,7 +52,7 @@ export const useWorkCards = (userRole: string) => {
   ) => {
     const updatedWorkCards = storedWorkCards.map(card => {
       if (card.id === cardId) {
-        return {
+        const updatedCard = {
           ...card,
           status: 'scheduled' as const,
           scheduledDate,
@@ -60,12 +60,18 @@ export const useWorkCards = (userRole: string) => {
           assignedTechnician,
           requiredParts
         } satisfies StoredWorkCard;
+        return updatedCard;
       }
       return card;
     });
     
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
+    
+    // Force a refresh by triggering another state update after a short delay
+    setTimeout(() => {
+      setStoredWorkCards([...updatedWorkCards]);
+    }, 100);
     
     toast({
       title: "Work Card Scheduled",

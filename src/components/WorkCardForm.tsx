@@ -21,7 +21,7 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const handleSubmit = async (flightHours: string, cycles: string, environment: string) => {
     const generatedCard = await generateWorkCard(flightHours, cycles, environment);
     if (generatedCard) {
-      const newCard = {
+      const newCard: StoredWorkCard = {
         id: uuidv4(),
         content: generatedCard,
         flightHours,
@@ -29,7 +29,7 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
         environment,
         date: new Date().toLocaleDateString(),
         role: userRole,
-        status: 'draft'
+        status: 'draft' as const
       };
       addWorkCard(newCard);
       setSelectedCard(newCard);
@@ -46,7 +46,7 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
 
   const handleComplete = (taskResults: string, remarks: string) => {
     if (selectedCard) {
-      const updatedCard = {
+      const updatedCard: StoredWorkCard = {
         ...selectedCard,
         status: 'completed' as const,
         taskResults,
@@ -61,7 +61,6 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
         description: "The work card has been marked as completed and compliance records have been updated.",
       });
 
-      // Close the modal
       setShowModal(false);
     }
   };

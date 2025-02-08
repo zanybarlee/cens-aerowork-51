@@ -9,7 +9,7 @@ export interface StoredWorkCard {
   environment: string;
   date: string;
   role: string;
-  status?: 'draft' | 'scheduled' | 'completed';
+  status: 'draft' | 'scheduled' | 'completed';
   scheduledDate?: string;
   scheduledLocation?: string;
   assignedTechnician?: string;

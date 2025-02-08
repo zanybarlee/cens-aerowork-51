@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -26,22 +25,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
   const [aiResponse, setAiResponse] = useState("");
   const [directive, setDirective] = useState("");
   const [showNewDirectiveAlert, setShowNewDirectiveAlert] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowNewDirectiveAlert(true);
-      toast({
-        title: "New Directive Detected",
-        description: "CAAM/AD/TRG-2025-01 requires immediate attention for AW139 (9M-WST)",
-        variant: "destructive",
-      });
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [toast]);
-
-  const complianceDirectives: ComplianceDirective[] = [
+  const [directives, setDirectives] = useState<ComplianceDirective[]>([
     {
       id: "CAAM-2025-01",
       type: "AD",
@@ -81,58 +65,44 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
       priority: "high",
       deadline: "2024-04-30"
     }
-  ];
+  ]);
+  const { toast } = useToast();
 
-  const filterDirectives = (directives: ComplianceDirective[]) => {
-    if (!aircraft) return directives;
+  useEffect(() => {
+    const handleComplianceUpdate = (event: CustomEvent) => {
+      const { reference, status, completionDetails } = event.detail;
+      setDirectives(prev => prev.map(directive => {
+        if (directive.reference === reference) {
+          return {
+            ...directive,
+            status,
+            completionDetails
+          };
+        }
+        return directive;
+      }));
+    };
 
-    return directives.filter(directive => {
-      const isRelevantToModel = directive.description.toLowerCase().includes(aircraft.model.toLowerCase());
-      const flightHourMatch = directive.reference === "CAAM/AD/TRG-2025-01" 
-        ? aircraft.flightHours >= 3500 && aircraft.flightHours <= 3600
-        : true;
+    window.addEventListener('updateComplianceStatus', handleComplianceUpdate as EventListener);
+    return () => {
+      window.removeEventListener('updateComplianceStatus', handleComplianceUpdate as EventListener);
+    };
+  }, []);
 
-      return isRelevantToModel && flightHourMatch;
-    });
-  };
-
-  const handleNewComplianceDirective = async () => {
-    if (!directive.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a directive to analyze",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Mock response for demo
-      const mockResponse = `Analysis of compliance directive: ${directive}\n\n## Requirements:\n- Visual inspection required\n- Documentation update needed\n- Follow manufacturer guidelines\n\n## Timeline:\n- Complete within 30 days\n- Schedule inspection immediately`;
-      
-      setAiResponse(mockResponse);
-      setIsModalOpen(true);
-      setDirective("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
       setShowNewDirectiveAlert(true);
       toast({
-        title: "New Directive Added",
-        description: "A new compliance directive has been added to the queue.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to analyze directive. Please try again.",
+        title: "New Directive Detected",
+        description: "CAAM/AD/TRG-2025-01 requires immediate attention for AW139 (9M-WST)",
         variant: "destructive",
       });
-      console.error("Error analyzing directive:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const handleGenerateWorkCard = (directive: ComplianceDirective) => {
-    // Dispatch a custom event with the directive details
     const event = new CustomEvent('generateWorkCard', { 
       detail: { 
         flightHours: aircraft?.flightHours.toString() || '',
@@ -150,14 +120,11 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     
     setIsModalOpen(false);
 
-    // Scroll to work card section
     const workCardSection = document.getElementById('work-card-section');
     if (workCardSection) {
       workCardSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  const filteredDirectives = filterDirectives(complianceDirectives);
 
   return (
     <>
@@ -168,7 +135,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
             <DirectiveInput
               value={directive}
               onChange={setDirective}
-              onSubmit={handleNewComplianceDirective}
+              onSubmit={() => {}}
               isLoading={isLoading}
             />
           </CardTitle>
@@ -176,7 +143,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
         <CardContent className="space-y-6">
           <ComplianceAlert show={showNewDirectiveAlert} />
           <ComplianceTable
-            directives={filteredDirectives}
+            directives={directives}
             onViewDetails={(description) => {
               setAiResponse(description);
               setIsModalOpen(true);

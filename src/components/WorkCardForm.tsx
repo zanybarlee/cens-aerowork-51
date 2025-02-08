@@ -73,6 +73,20 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
 
       // If this is a compliance-related work card, update the bulletin status
       if (updatedCard.flightHours >= "3500" && updatedCard.flightHours <= "3600") {
+        // Dispatch event to update compliance status
+        const updateEvent = new CustomEvent('updateComplianceStatus', {
+          detail: {
+            reference: "CAAM/AD/TRG-2025-01",
+            status: 'closed',
+            completionDetails: {
+              technician: signature,
+              date: new Date().toLocaleDateString(),
+              remarks: remarks
+            }
+          }
+        });
+        window.dispatchEvent(updateEvent);
+
         toast({
           title: "Compliance Update",
           description: "CAAM/AD/TRG-2025-01 status has been updated to Closed in the Compliance Management System.",

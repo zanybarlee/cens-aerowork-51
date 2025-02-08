@@ -21,6 +21,7 @@ export interface StoredWorkCard {
     partNumber: string;
     quantity: number;
   }[];
+  linkedDirectiveRef?: string;  // Added this property
 }
 
 export interface WorkCardFormProps {

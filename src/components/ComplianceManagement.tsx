@@ -108,9 +108,10 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
 
     setIsLoading(true);
     try {
-      const prompt = `Analyze compliance directive: ${directive} for AW139 helicopter`;
-      const response = await query({ question: prompt });
-      setAiResponse(response);
+      // Mock response for demo
+      const mockResponse = `Analysis of compliance directive: ${directive}\n\n## Requirements:\n- Visual inspection required\n- Documentation update needed\n- Follow manufacturer guidelines\n\n## Timeline:\n- Complete within 30 days\n- Schedule inspection immediately`;
+      
+      setAiResponse(mockResponse);
       setIsModalOpen(true);
       setDirective("");
       setShowNewDirectiveAlert(true);
@@ -128,21 +129,6 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const query = async (data: { question: string }) => {
-    const response = await fetch(
-      "http://127.0.0.1:3000/api/v1/prediction/4131f902-cf99-4885-991d-4662f38113bb",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-    const result = await response.json();
-    return result.text;
   };
 
   const filteredDirectives = filterDirectives(complianceDirectives);

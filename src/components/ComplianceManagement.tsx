@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { ComplianceDirective } from "@/types/weststar";
 import { ComplianceAlert } from "./compliance/ComplianceAlert";
@@ -27,18 +27,30 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
   const [showNewDirectiveAlert, setShowNewDirectiveAlert] = useState(false);
   const { toast } = useToast();
 
-  // Sample directives data - in a real app this would come from an API
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowNewDirectiveAlert(true);
+      toast({
+        title: "New Directive Detected",
+        description: "CAAM/AD/TRG-2025-01 requires immediate attention for AW139 (9M-WST)",
+        variant: "destructive",
+      });
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const complianceDirectives: ComplianceDirective[] = [
     {
-      id: "CAAM-2024-01",
+      id: "CAAM-2025-01",
       type: "AD",
-      reference: "CAAM/AD/TRG-2024-01",
-      title: "Main Rotor Blade Inspection",
-      description: "Mandatory inspection of main rotor blades for possible delamination",
-      effectiveDate: "2024-03-15",
+      reference: "CAAM/AD/TRG-2025-01",
+      title: "Tail Rotor Gearbox Inspection",
+      description: "Mandatory inspection of tail rotor gearbox for AW139 helicopters with flight hours between 3,500-3,600. Inspection must be performed within 100 flight hours from current status.",
+      effectiveDate: "2025-04-15",
       status: "open",
       priority: "high",
-      deadline: "2024-04-15"
+      deadline: "2025-05-15"
     },
     {
       id: "SB-407-24-01",
@@ -68,10 +80,10 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     if (!aircraft) return directives;
 
     return directives.filter(directive => {
-      const isRelevantToModel = directive.description.toLowerCase().includes('aw139') || 
-                               !directive.description.toLowerCase().includes('model');
-      const flightHourMatch = directive.description.toLowerCase().includes('flight hours') ? 
-        aircraft.flightHours >= 3000 : true;
+      const isRelevantToModel = directive.description.toLowerCase().includes(aircraft.model.toLowerCase());
+      const flightHourMatch = directive.reference === "CAAM/AD/TRG-2025-01" 
+        ? aircraft.flightHours >= 3500 && aircraft.flightHours <= 3600
+        : true;
 
       return isRelevantToModel && flightHourMatch;
     });

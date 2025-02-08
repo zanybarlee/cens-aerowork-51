@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
@@ -146,6 +145,10 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
               <div className="space-y-4">
                 {selectedDate && getWorkCardsForDate(selectedDate).map((card, index) => (
                   <div key={index} className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <CalendarIcon className="w-4 h-4" />
+                      <span className="text-sm">Date: {new Date(card.scheduledDate!).toLocaleDateString()}</span>
+                    </div>
                     <div className="flex items-center gap-2 text-gray-600">
                       <MapPin className="w-4 h-4" />
                       <span className="text-sm">Location: {card.scheduledLocation}</span>

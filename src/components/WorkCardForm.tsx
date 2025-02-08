@@ -9,6 +9,7 @@ import { useWorkCards } from "@/hooks/useWorkCards";
 import { v4 as uuidv4 } from 'uuid';
 import { StoredWorkCardsTable } from "./WorkCardGenerator/StoredWorkCardsTable";
 import { useToast } from "@/hooks/use-toast";
+import { useDirectives } from "@/hooks/useDirectives";
 
 export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const { workCard, isLoading, generateWorkCard } = useWorkCardGeneration(aircraft);
@@ -17,12 +18,13 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const [selectedContent, setSelectedContent] = useState<string>("");
   const [selectedCard, setSelectedCard] = useState<StoredWorkCard | undefined>();
   const { toast } = useToast();
+  const { directives, updateComplianceStatus } = useDirectives();
 
   // Listen for work card generation events
   useEffect(() => {
     const handleWorkCardGeneration = async (event: CustomEvent) => {
       const { flightHours, cycles, environment, directive } = event.detail;
-      await handleSubmit(flightHours, cycles, environment);
+      await handleSubmit(flightHours, cycles, environment, directive?.reference);
     };
 
     window.addEventListener('generateWorkCard', handleWorkCardGeneration as EventListener);
@@ -31,7 +33,12 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
     };
   }, []);
 
-  const handleSubmit = async (flightHours: string, cycles: string, environment: string) => {
+  const handleSubmit = async (
+    flightHours: string, 
+    cycles: string, 
+    environment: string,
+    directiveRef?: string
+  ) => {
     const generatedCard = await generateWorkCard(flightHours, cycles, environment);
     if (generatedCard) {
       const workCardId = `WC-${new Date().getFullYear()}-${uuidv4().slice(0, 8)}`.toUpperCase();
@@ -43,7 +50,8 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
         environment,
         date: new Date().toLocaleDateString(),
         role: userRole,
-        status: 'draft' as const
+        status: 'draft' as const,
+        linkedDirectiveRef: directiveRef // Store the linked directive reference
       };
       addWorkCard(newCard);
       setSelectedCard(newCard);
@@ -71,25 +79,21 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
       };
       addWorkCard(updatedCard);
 
-      // If this is a compliance-related work card, update the bulletin status
-      if (updatedCard.flightHours >= "3500" && updatedCard.flightHours <= "3600") {
-        // Dispatch event to update compliance status
-        const updateEvent = new CustomEvent('updateComplianceStatus', {
-          detail: {
-            reference: "CAAM/AD/TRG-2025-01",
-            status: 'closed',
-            completionDetails: {
-              technician: signature,
-              date: new Date().toLocaleDateString(),
-              remarks: remarks
-            }
+      // If this work card is linked to a directive, update its status
+      if (updatedCard.linkedDirectiveRef) {
+        updateComplianceStatus(
+          updatedCard.linkedDirectiveRef,
+          'closed',
+          {
+            technician: signature,
+            date: new Date().toLocaleDateString(),
+            remarks: remarks
           }
-        });
-        window.dispatchEvent(updateEvent);
+        );
 
         toast({
           title: "Compliance Update",
-          description: "CAAM/AD/TRG-2025-01 status has been updated to Closed in the Compliance Management System.",
+          description: `${updatedCard.linkedDirectiveRef} status has been updated to Closed in the Compliance Management System.`,
         });
       }
 

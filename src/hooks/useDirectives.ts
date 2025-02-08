@@ -81,12 +81,11 @@ export const useDirectives = () => {
         deadline: formData.deadline,
       };
 
-      // Update state with the new directive
-      const updatedDirectives = [newDirective, ...directives];
-      setDirectives(updatedDirectives);
-      
-      // Explicitly save to localStorage
-      localStorage.setItem('complianceDirectives', JSON.stringify(updatedDirectives));
+      setDirectives(prev => {
+        const updated = [newDirective, ...prev];
+        localStorage.setItem('complianceDirectives', JSON.stringify(updated));
+        return updated;
+      });
 
       toast({
         title: "Success",
@@ -115,13 +114,18 @@ export const useDirectives = () => {
           return {
             ...directive,
             status,
-            completionDetails
+            completionDetails: completionDetails || directive.completionDetails
           };
         }
         return directive;
       });
       localStorage.setItem('complianceDirectives', JSON.stringify(updated));
       return updated;
+    });
+
+    toast({
+      title: "Directive Updated",
+      description: `Directive ${reference} status updated to ${status}`,
     });
   };
 

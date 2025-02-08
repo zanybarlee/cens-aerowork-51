@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -46,7 +47,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
       type: "AD",
       reference: "CAAM/AD/TRG-2025-01",
       title: "Tail Rotor Gearbox Inspection",
-      description: "Mandatory inspection of tail rotor gearbox for AW139 helicopters with flight hours between 3,500-3,600. Inspection must be performed within 100 flight hours from current status.",
+      description: "Mandatory inspection of tail rotor gearbox for AW139 helicopters with flight hours between 3,500-3,600. Inspection must be performed within 100 flight hours from current status.\n\n**OEM Requirements:**\n- Visual inspection for corrosion\n- Torque checks on all mounting bolts\n- Magnetic particle inspection of critical areas\n- Lubrication system integrity check",
       effectiveDate: "2025-04-15",
       status: "open",
       priority: "high",
@@ -145,7 +146,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
       <Card className="w-full shadow-lg animate-fadeIn">
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-blue-900 flex justify-between items-center">
-            <span>Compliance Monitoring</span>
+            <span>Compliance Monitoring - {aircraft?.tailNumber}</span>
             <DirectiveInput
               value={directive}
               onChange={setDirective}

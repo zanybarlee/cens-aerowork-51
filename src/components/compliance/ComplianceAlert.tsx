@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Clock } from "lucide-react";
 
 interface ComplianceAlertProps {
   show: boolean;
@@ -18,9 +18,9 @@ export function ComplianceAlert({ show }: ComplianceAlertProps) {
         <p>New AD CAAM/AD/TRG-2025-01 requires immediate attention:</p>
         <ul className="list-disc list-inside mt-2">
           <li>Tail Rotor Gearbox Inspection required</li>
-          <li>Current flight hours: 3,500</li>
-          <li>Inspection due within: 100 flight hours</li>
-          <li>Aircraft affected: AW139 (9M-WST)</li>
+          <li>Must be performed at or before 3,600 flight hours</li>
+          <li>Current status: Within inspection window (3,500-3,600 hours)</li>
+          <li>Due by: 10 days (2025-05-15)</li>
         </ul>
       </AlertDescription>
     </Alert>

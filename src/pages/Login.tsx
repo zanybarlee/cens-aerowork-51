@@ -13,39 +13,67 @@ const Login = () => {
   const { toast } = useToast();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [tenant, setTenant] = React.useState("weststar");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you would validate credentials here
-    toast({
-      title: "Login successful",
-      description: "Redirecting to dashboard...",
-    });
-    navigate("/dashboard");
+    if (tenant === "weststar") {
+      toast({
+        title: "Welcome to Weststar Aviation Services",
+        description: "Redirecting to MRO dashboard...",
+      });
+      navigate("/weststar");
+    } else {
+      toast({
+        title: "Login successful",
+        description: "Redirecting to dashboard...",
+      });
+      navigate("/dashboard");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-workspace-background to-workspace-secondary/10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-900 to-blue-800">
       <Button
         variant="ghost"
-        className="absolute top-4 left-4 flex items-center gap-2"
+        className="absolute top-4 left-4 flex items-center gap-2 text-white hover:text-blue-200"
         onClick={() => navigate("/")}
       >
         <ChevronLeft className="h-4 w-4" />
         Back to Home
       </Button>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center font-bold text-workspace-primary">
-            Login to Aptiv8 GenAI AeroGuardian
+          <CardTitle className="text-2xl text-center font-bold">
+            {tenant === "weststar" ? (
+              <div className="space-y-2">
+                <div className="text-blue-900">Weststar Aviation Services</div>
+                <div className="text-lg text-blue-700">MRO Management System</div>
+              </div>
+            ) : (
+              "Login to Aptiv8 GenAI AeroGuardian"
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
+              <Label htmlFor="tenant">Organization</Label>
+              <select
+                id="tenant"
+                className="w-full p-2 border rounded-md"
+                value={tenant}
+                onChange={(e) => setTenant(e.target.value)}
+              >
+                <option value="weststar">Weststar Aviation Services</option>
+                <option value="default">AeroGuardian Default</option>
+              </select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <User className="absolute left-3 top-2.5 h-5 w-5 text-workspace-text/50" />
+                <User className="absolute left-3 top-2.5 h-5 w-5 text-blue-900/50" />
                 <Input
                   id="email"
                   type="email"
@@ -60,7 +88,7 @@ const Login = () => {
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-workspace-text/50" />
+                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-blue-900/50" />
                 <Input
                   id="password"
                   type="password"
@@ -72,7 +100,10 @@ const Login = () => {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full bg-workspace-primary">
+            <Button 
+              type="submit" 
+              className="w-full bg-blue-900 hover:bg-blue-800 text-white"
+            >
               Login
             </Button>
           </form>

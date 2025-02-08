@@ -1,15 +1,19 @@
 
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ComplianceManagement } from "@/components/ComplianceManagement";
 import { WorkCardForm } from "@/components/WorkCardForm";
 import { MainDashboard } from "@/components/MainDashboard";
 import { MaintenanceScheduler } from "@/components/MaintenanceScheduler";
 import { Aircraft } from "@/types/weststar";
 import { Calendar } from "@/components/ui/calendar";
+import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 export default function WeststarDashboard() {
   const [selectedRole, setSelectedRole] = useState<string>("planner");
+  const navigate = useNavigate();
   
   const aircraft: Aircraft = {
     tailNumber: "9M-WST",
@@ -20,12 +24,24 @@ export default function WeststarDashboard() {
     lastInspectionDate: "2025-01-12"
   };
 
+  const handleLogout = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-blue-900">
           Weststar Aviation Services - AW139 Maintenance
         </h1>
+        <Button 
+          onClick={handleLogout}
+          variant="outline"
+          className="flex items-center gap-2 text-blue-900 hover:text-blue-700 hover:bg-blue-50"
+        >
+          <LogOut className="w-4 h-4" />
+          Logout
+        </Button>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

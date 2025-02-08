@@ -38,9 +38,10 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
     }
   };
 
-  const handleViewDetails = (card: StoredWorkCard) => {
+  const handleViewDetails = (content: string) => {
+    const card = storedWorkCards.find(c => c.content === content);
     setSelectedCard(card);
-    setSelectedContent(card.content);
+    setSelectedContent(content);
     setShowModal(true);
   };
 

@@ -11,7 +11,7 @@ interface WorkCardTableRowProps {
   userRole: string;
   onRowClick: (card: StoredWorkCard) => void;
   onDelete: (id: string) => void;
-  onViewDetails: (card: StoredWorkCard) => void;
+  onViewDetails: (content: string) => void;
 }
 
 export function WorkCardTableRow({
@@ -43,7 +43,7 @@ export function WorkCardTableRow({
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
-            onViewDetails(card);
+            onViewDetails(card.content);
           }}
         >
           <Info className="h-4 w-4 mr-1" />

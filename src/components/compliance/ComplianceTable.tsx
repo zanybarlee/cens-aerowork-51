@@ -60,8 +60,8 @@ export function ComplianceTable({
             <TableHead>Deadline</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Completion Details</TableHead>
             <TableHead>Actions</TableHead>
+            <TableHead>Completion Details</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -87,19 +87,6 @@ export function ComplianceTable({
                     } : undefined}
                   />
                 </div>
-              </TableCell>
-              <TableCell>
-                {directive.completionDetails ? (
-                  <div className="text-sm text-gray-600">
-                    <p>Tech: {directive.completionDetails.technician}</p>
-                    <p>Date: {directive.completionDetails.date}</p>
-                    {directive.completionDetails.remarks && (
-                      <p className="text-xs italic">"{directive.completionDetails.remarks}"</p>
-                    )}
-                  </div>
-                ) : (
-                  <span className="text-gray-400">-</span>
-                )}
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
@@ -144,6 +131,19 @@ export function ComplianceTable({
                   )}
                 </div>
               </TableCell>
+              <TableCell>
+                {directive.completionDetails ? (
+                  <div className="text-sm text-gray-600">
+                    <p>Tech: {directive.completionDetails.technician}</p>
+                    <p>Date: {directive.completionDetails.date}</p>
+                    {directive.completionDetails.remarks && (
+                      <p className="text-xs italic">"{directive.completionDetails.remarks}"</p>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -151,3 +151,4 @@ export function ComplianceTable({
     </div>
   );
 }
+

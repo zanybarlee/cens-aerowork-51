@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, User, Calendar as CalendarIcon } from "lucide-react";
 import { Aircraft } from "@/types/weststar";
 import { useWorkCards } from "@/hooks/useWorkCards";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface MaintenanceSchedulerProps {
   aircraft: Aircraft;
@@ -13,10 +14,33 @@ interface MaintenanceSchedulerProps {
 
 export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
   const { storedWorkCards } = useWorkCards('maintenance-planner');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [showDialog, setShowDialog] = useState(false);
   
-  // Find the latest scheduled work card
-  const latestScheduledCard = storedWorkCards
-    .filter(card => card.status === 'scheduled')
+  // Find all scheduled work cards
+  const scheduledCards = storedWorkCards.filter(card => card.status === 'scheduled');
+  
+  // Get work cards for selected date
+  const getWorkCardsForDate = (date: Date) => {
+    return scheduledCards.filter(card => {
+      const cardDate = new Date(card.scheduledDate);
+      return cardDate.toDateString() === date.toDateString();
+    });
+  };
+
+  // Handle date selection
+  const handleSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
+      const cardsForDate = getWorkCardsForDate(date);
+      if (cardsForDate.length > 0) {
+        setShowDialog(true);
+      }
+    }
+  };
+
+  // Find the latest scheduled work card for default display
+  const latestScheduledCard = scheduledCards
     .sort((a, b) => new Date(b.scheduledDate).getTime() - new Date(a.scheduledDate).getTime())[0];
 
   const maintenanceDate = latestScheduledCard ? new Date(latestScheduledCard.scheduledDate) : new Date();
@@ -25,10 +49,13 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
   const inventoryStatus = latestScheduledCard?.requiredParts?.reduce((acc, part) => {
     acc[part.partNumber] = {
       inStock: part.quantity,
-      leadTime: "2 weeks" // This could be fetched from an inventory system in the future
+      leadTime: "2 weeks"
     };
     return acc;
   }, {} as Record<string, { inStock: number; leadTime: string }>) || {};
+
+  // Create a list of dates that have scheduled maintenance
+  const scheduledDates = scheduledCards.map(card => new Date(card.scheduledDate));
 
   return (
     <Card className="bg-white shadow-md">
@@ -94,10 +121,46 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
             <Calendar
               mode="single"
               selected={maintenanceDate}
+              onSelect={handleSelect}
               className="rounded-md border bg-white"
+              modifiers={{
+                scheduled: scheduledDates
+              }}
+              modifiersStyles={{
+                scheduled: {
+                  backgroundColor: '#dbeafe',
+                  borderRadius: '4px'
+                }
+              }}
             />
           </div>
         </div>
+
+        <Dialog open={showDialog} onOpenChange={setShowDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Scheduled Maintenance for {selectedDate?.toLocaleDateString()}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {selectedDate && getWorkCardsForDate(selectedDate).map((card, index) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">Location: {card.scheduledLocation}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">Technician: {card.assignedTechnician}</span>
+                  </div>
+                  <div className="text-sm text-gray-600 mt-2">
+                    <strong>Work Card Details:</strong>
+                    <p className="mt-1 whitespace-pre-wrap">{card.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

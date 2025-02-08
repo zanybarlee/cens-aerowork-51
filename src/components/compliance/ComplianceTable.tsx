@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Eye } from "lucide-react";
+import { Eye, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -39,6 +39,13 @@ export function ComplianceTable({
     }
   };
 
+  const getAuditInfo = (directive: ComplianceDirective) => {
+    if (directive.status === 'closed' && directive.completionDetails) {
+      return `Completed by ${directive.completionDetails.technician} on ${directive.completionDetails.date}`;
+    }
+    return null;
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -51,12 +58,13 @@ export function ComplianceTable({
             <TableHead>Deadline</TableHead>
             <TableHead>Priority</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Completion Details</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {directives.map((directive) => (
-            <TableRow key={directive.id}>
+            <TableRow key={directive.id} className={directive.status === 'closed' ? 'bg-green-50' : ''}>
               <TableCell className="font-medium">{directive.reference}</TableCell>
               <TableCell>
                 <Badge variant="outline">{directive.type}</Badge>
@@ -79,15 +87,49 @@ export function ComplianceTable({
                 </div>
               </TableCell>
               <TableCell>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-blue-900 hover:text-blue-800"
-                  onClick={() => onViewDetails(directive.description)}
-                >
-                  <Eye className="w-4 h-4 mr-1" />
-                  View Details
-                </Button>
+                {directive.completionDetails ? (
+                  <div className="text-sm text-gray-600">
+                    <p>Tech: {directive.completionDetails.technician}</p>
+                    <p>Date: {directive.completionDetails.date}</p>
+                    {directive.completionDetails.remarks && (
+                      <p className="text-xs italic">"{directive.completionDetails.remarks}"</p>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-gray-400">-</span>
+                )}
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-blue-900 hover:text-blue-800"
+                    onClick={() => onViewDetails(directive.description)}
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    View Details
+                  </Button>
+                  {directive.status === 'closed' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-green-700 hover:text-green-800"
+                      onClick={() => {
+                        const auditInfo = getAuditInfo(directive);
+                        if (auditInfo) {
+                          toast({
+                            title: "Audit Trail",
+                            description: auditInfo,
+                          });
+                        }
+                      }}
+                    >
+                      <FileText className="w-4 h-4 mr-1" />
+                      Audit Log
+                    </Button>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))}

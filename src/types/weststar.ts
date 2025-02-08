@@ -18,6 +18,11 @@ export interface ComplianceDirective {
   status: 'open' | 'closed' | 'not-applicable';
   priority: 'high' | 'medium' | 'low';
   deadline?: string;
+  completionDetails?: {
+    technician: string;
+    date: string;
+    remarks?: string;
+  };
 }
 
 export interface MaintenanceTask {

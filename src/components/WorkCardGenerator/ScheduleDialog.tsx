@@ -107,56 +107,62 @@ export function ScheduleDialog({
     open: boolean;
     setOpen: (open: boolean) => void;
     placeholder: string;
-  }) => (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {value || placeholder}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput 
-              placeholder={`Search or enter custom ${label.toLowerCase()}...`}
-              value={value}
-              onValueChange={onChange}
-            />
-            <CommandList>
-              <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
-              <CommandGroup heading={`Preset ${label}s`}>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    onSelect={(currentValue) => {
-                      onChange(option.label);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        value === option.label ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {option.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
+  }) => {
+    const getDisplayValue = () => {
+      if (!value) return placeholder;
+      const option = options.find(opt => opt.value === value || opt.label === value);
+      return option ? option.label : value;
+    };
+
+    return (
+      <div className="space-y-2">
+        <Label>{label}</Label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {getDisplayValue()}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput 
+                placeholder={`Search or enter custom ${label.toLowerCase()}...`}
+              />
+              <CommandList>
+                <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
+                <CommandGroup heading={`Preset ${label}s`}>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      onSelect={() => {
+                        onChange(option.value);
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === option.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {option.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

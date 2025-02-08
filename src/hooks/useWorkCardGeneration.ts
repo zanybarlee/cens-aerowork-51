@@ -79,6 +79,15 @@ ${parseInt(flightHours) >= 3500 && parseInt(flightHours) <= 3600 ?
 ` : ''}
 ${response}
 
+## Completion Status
+| Task | Status | Technician | Remarks |
+|------|---------|------------|---------|
+| Remove tail rotor fairing | ⏳ Pending | - | - |
+| Drain gearbox oil, check for particles | ⏳ Pending | - | - |
+| Inspect gearbox housing | ⏳ Pending | - | - |
+| Replace/refill oil (P/N AW139-GB-OIL10) | ⏳ Pending | - | - |
+| Reinstall fairing, test run | ⏳ Pending | - | - |
+
 ## Quality Assurance
 - All work must be documented in the aircraft technical log
 - Any discrepancies must be reported to the maintenance supervisor
@@ -93,7 +102,12 @@ ${parseInt(flightHours) >= 3500 && parseInt(flightHours) <= 3600 ?
 ## Sign-off Requirements
 - Licensed Aircraft Maintenance Engineer
 - Quality Assurance Inspector
-- Maintenance Manager approval required for return to service`;
+- Maintenance Manager approval required for return to service
+
+## Electronic Signature
+Technician ID: _____________
+Date: _____________
+Time: _____________`;
 
       setWorkCard(formattedResponse);
       return formattedResponse;

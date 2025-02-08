@@ -14,13 +14,31 @@ import {
 import { ComplianceDirective } from "@/types/weststar";
 import { StatusBadge } from "./StatusBadge";
 import { PriorityBadge } from "./PriorityBadge";
+import { useToast } from "@/hooks/use-toast";
 
 interface ComplianceTableProps {
   directives: ComplianceDirective[];
   onViewDetails: (description: string) => void;
+  onUpdateStatus?: (id: string, newStatus: 'open' | 'closed' | 'not-applicable') => void;
 }
 
-export function ComplianceTable({ directives, onViewDetails }: ComplianceTableProps) {
+export function ComplianceTable({ 
+  directives, 
+  onViewDetails,
+  onUpdateStatus 
+}: ComplianceTableProps) {
+  const { toast } = useToast();
+
+  const handleStatusUpdate = (id: string, status: 'open' | 'closed' | 'not-applicable') => {
+    if (onUpdateStatus) {
+      onUpdateStatus(id, status);
+      toast({
+        title: "Status Updated",
+        description: `Directive status has been updated to ${status}`,
+      });
+    }
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -50,7 +68,15 @@ export function ComplianceTable({ directives, onViewDetails }: ComplianceTablePr
                 <PriorityBadge priority={directive.priority} />
               </TableCell>
               <TableCell>
-                <StatusBadge status={directive.status} />
+                <div className="flex items-center gap-2">
+                  <StatusBadge 
+                    status={directive.status} 
+                    onClick={onUpdateStatus ? () => {
+                      const newStatus = directive.status === 'open' ? 'closed' : 'open';
+                      handleStatusUpdate(directive.id, newStatus);
+                    } : undefined}
+                  />
+                </div>
               </TableCell>
               <TableCell>
                 <Button

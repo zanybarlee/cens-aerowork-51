@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -131,6 +130,23 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     }
   };
 
+  const handleGenerateWorkCard = (directive: ComplianceDirective) => {
+    // Find the Work Card Generator section in the DOM
+    const workCardGenerator = document.querySelector('[data-section="work-card-generator"]');
+    if (workCardGenerator) {
+      workCardGenerator.scrollIntoView({ behavior: 'smooth' });
+      
+      // Pre-fill the work card form with directive details
+      if (aircraft) {
+        toast({
+          title: "Work Card Generation",
+          description: "Work card form has been pre-filled with compliance directive details.",
+        });
+      }
+    }
+    setIsModalOpen(false);
+  };
+
   const filteredDirectives = filterDirectives(complianceDirectives);
 
   return (
@@ -155,6 +171,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
               setAiResponse(description);
               setIsModalOpen(true);
             }}
+            onGenerateWorkCard={handleGenerateWorkCard}
           />
         </CardContent>
       </Card>

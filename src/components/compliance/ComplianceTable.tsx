@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Eye, FileText } from "lucide-react";
+import { Eye, FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -20,12 +20,14 @@ interface ComplianceTableProps {
   directives: ComplianceDirective[];
   onViewDetails: (description: string) => void;
   onUpdateStatus?: (id: string, newStatus: 'open' | 'closed' | 'not-applicable') => void;
+  onGenerateWorkCard?: (directive: ComplianceDirective) => void;
 }
 
 export function ComplianceTable({ 
   directives, 
   onViewDetails,
-  onUpdateStatus 
+  onUpdateStatus,
+  onGenerateWorkCard
 }: ComplianceTableProps) {
   const { toast } = useToast();
 
@@ -110,6 +112,17 @@ export function ComplianceTable({
                     <Eye className="w-4 h-4 mr-1" />
                     View Details
                   </Button>
+                  {directive.status === 'open' && onGenerateWorkCard && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-green-700 hover:text-green-800"
+                      onClick={() => onGenerateWorkCard(directive)}
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Generate Work Card
+                    </Button>
+                  )}
                   {directive.status === 'closed' && (
                     <Button
                       variant="outline"

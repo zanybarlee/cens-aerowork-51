@@ -54,12 +54,12 @@ export const useWorkCards = (userRole: string) => {
       if (card.id === cardId) {
         return {
           ...card,
-          status: 'scheduled',
+          status: 'scheduled' as const,
           scheduledDate,
           scheduledLocation,
           assignedTechnician,
           requiredParts
-        };
+        } satisfies StoredWorkCard;
       }
       return card;
     });
@@ -80,4 +80,3 @@ export const useWorkCards = (userRole: string) => {
     scheduleWorkCard
   };
 };
-

@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StoredWorkCard } from "@/types/workCard";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -20,6 +19,28 @@ export const useWorkCards = (userRole: string) => {
   });
   
   const { toast } = useToast();
+
+  // Effect to periodically refresh the work cards from localStorage
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      const plannerCards = localStorage.getItem("workCards_maintenance-planner");
+      const technicianCards = localStorage.getItem("workCards_engineer-technician");
+      
+      const plannerData = plannerCards ? JSON.parse(plannerCards) : [];
+      const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
+      
+      if (userRole === "engineer-technician") {
+        setStoredWorkCards([...plannerData, ...technicianData]);
+      } else {
+        const saved = localStorage.getItem(`workCards_${userRole}`);
+        if (saved) {
+          setStoredWorkCards(JSON.parse(saved));
+        }
+      }
+    }, 1000); // Refresh every second
+
+    return () => clearInterval(refreshInterval);
+  }, [userRole]);
 
   const addWorkCard = (newWorkCard: StoredWorkCard) => {
     const updatedWorkCards = [newWorkCard, ...storedWorkCards];

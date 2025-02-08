@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Info, Trash2, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,16 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
     partNumber: '',
     quantity: ''
   });
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Effect to refresh the table data
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      setRefreshTrigger(prev => prev + 1);
+    }, 1000); // Refresh every second
+
+    return () => clearInterval(refreshInterval);
+  }, []);
 
   const handleScheduleSubmit = () => {
     if (selectedCardId) {
@@ -53,6 +63,8 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
         partNumber: '',
         quantity: ''
       });
+      // Trigger an immediate refresh
+      setRefreshTrigger(prev => prev + 1);
     }
   };
 

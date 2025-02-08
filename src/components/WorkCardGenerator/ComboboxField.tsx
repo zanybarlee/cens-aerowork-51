@@ -27,8 +27,16 @@ export function ComboboxField({
   placeholder,
 }: ComboboxFieldProps) {
   const getDisplayValue = () => {
-    const option = options.find(opt => opt.value === value);
-    return option ? option.label : value || placeholder;
+    const selectedOption = options.find(opt => opt.value === value);
+    return selectedOption ? selectedOption.label : value || placeholder;
+  };
+
+  const handleSelect = (currentValue: string) => {
+    const selectedOption = options.find(opt => opt.value === currentValue);
+    if (selectedOption) {
+      onChange(selectedOption.value);
+      setOpen(false);
+    }
   };
 
   return (
@@ -63,10 +71,7 @@ export function ComboboxField({
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={(currentValue) => {
-                      onChange(option.value);
-                      setOpen(false);
-                    }}
+                    onSelect={() => handleSelect(option.value)}
                   >
                     <Check
                       className={cn(

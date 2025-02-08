@@ -7,6 +7,7 @@ import { MapPin, User, Calendar as CalendarIcon } from "lucide-react";
 import { Aircraft } from "@/types/weststar";
 import { useWorkCards } from "@/hooks/useWorkCards";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface MaintenanceSchedulerProps {
   aircraft: Aircraft;
@@ -30,8 +31,8 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
 
   // Handle date selection
   const handleSelect = (date: Date | undefined) => {
+    setSelectedDate(date);
     if (date) {
-      setSelectedDate(date);
       const cardsForDate = getWorkCardsForDate(date);
       if (cardsForDate.length > 0) {
         setShowDialog(true);
@@ -120,7 +121,7 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
             <h3 className="text-sm font-medium mb-3 text-gray-700">Maintenance Calendar</h3>
             <Calendar
               mode="single"
-              selected={maintenanceDate}
+              selected={selectedDate}
               onSelect={handleSelect}
               className="rounded-md border bg-white"
               modifiers={{
@@ -137,28 +138,30 @@ export function MaintenanceScheduler({ aircraft }: MaintenanceSchedulerProps) {
         </div>
 
         <Dialog open={showDialog} onOpenChange={setShowDialog}>
-          <DialogContent>
+          <DialogContent className="max-h-[80vh]">
             <DialogHeader>
               <DialogTitle>Scheduled Maintenance for {selectedDate?.toLocaleDateString()}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              {selectedDate && getWorkCardsForDate(selectedDate).map((card, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-lg space-y-3">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm">Location: {card.scheduledLocation}</span>
+            <ScrollArea className="h-[50vh] mt-4 pr-4">
+              <div className="space-y-4">
+                {selectedDate && getWorkCardsForDate(selectedDate).map((card, index) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="w-4 h-4" />
+                      <span className="text-sm">Location: {card.scheduledLocation}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <User className="w-4 h-4" />
+                      <span className="text-sm">Technician: {card.assignedTechnician}</span>
+                    </div>
+                    <div className="text-sm text-gray-600 mt-2">
+                      <strong>Work Card Details:</strong>
+                      <p className="mt-1 whitespace-pre-wrap">{card.content}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <User className="w-4 h-4" />
-                    <span className="text-sm">Technician: {card.assignedTechnician}</span>
-                  </div>
-                  <div className="text-sm text-gray-600 mt-2">
-                    <strong>Work Card Details:</strong>
-                    <p className="mt-1 whitespace-pre-wrap">{card.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </CardContent>

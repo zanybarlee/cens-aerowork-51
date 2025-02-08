@@ -7,12 +7,22 @@ import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Aircraft } from "@/types/weststar";
 
 const Dashboard = () => {
   const [showRoleSelector, setShowRoleSelector] = React.useState(true);
   const [selectedRole, setSelectedRole] = React.useState<UserRole | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Default aircraft data
+  const defaultAircraft: Aircraft = {
+    tailNumber: "DEFAULT",
+    model: "AW139",
+    flightHours: 0,
+    cycles: 0,
+    environment: "default",
+  };
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
@@ -64,7 +74,7 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-bold text-workspace-primary mb-6">
                   Work Card Generator
                 </h2>
-                <WorkCardForm userRole={selectedRole.id} />
+                <WorkCardForm userRole={selectedRole.id} aircraft={defaultAircraft} />
               </div>
             )}
             {(selectedRole.module === "compliance" || selectedRole.module === "both") && (
@@ -72,7 +82,7 @@ const Dashboard = () => {
                 <h2 className="text-2xl font-bold text-workspace-primary mb-6">
                   Compliance Management
                 </h2>
-                <ComplianceManagement userRole={selectedRole.id} />
+                <ComplianceManagement userRole={selectedRole.id} aircraft={defaultAircraft} />
               </div>
             )}
           </div>

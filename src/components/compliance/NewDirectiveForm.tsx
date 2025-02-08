@@ -19,14 +19,24 @@ interface NewDirectiveFormProps {
   isLoading: boolean;
 }
 
+type FormData = {
+  reference: string;
+  type: 'AD' | 'SB';
+  issuingBody: string;
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  deadline: string;
+}
+
 export function NewDirectiveForm({ onSubmit, isLoading }: NewDirectiveFormProps) {
-  const [formData, setFormData] = React.useState({
+  const [formData, setFormData] = React.useState<FormData>({
     reference: '',
-    type: 'AD' as const,
+    type: 'AD',
     issuingBody: '',
     title: '',
     description: '',
-    priority: 'medium' as const,
+    priority: 'medium',
     deadline: ''
   });
 
@@ -80,9 +90,7 @@ export function NewDirectiveForm({ onSubmit, isLoading }: NewDirectiveFormProps)
           <Label htmlFor="priority">Priority</Label>
           <Select
             value={formData.priority}
-            onValueChange={(value: 'high' | 'medium' | 'low') => 
-              setFormData(prev => ({ ...prev, priority: value }))
-            }
+            onValueChange={(value: 'high' | 'medium' | 'low') => setFormData(prev => ({ ...prev, priority: value }))}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select priority" />

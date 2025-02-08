@@ -43,10 +43,23 @@ export const useWorkCards = (userRole: string) => {
     });
   };
 
-  const scheduleWorkCard = (cardId: string, schedulingData: Partial<StoredWorkCard>) => {
+  const scheduleWorkCard = (
+    cardId: string, 
+    scheduledDate: string, 
+    scheduledLocation: string, 
+    assignedTechnician: string, 
+    requiredParts: { partNumber: string; quantity: number }[]
+  ) => {
     const updatedWorkCards = storedWorkCards.map(card => {
       if (card.id === cardId) {
-        return { ...card, ...schedulingData, status: 'scheduled' as const };
+        return {
+          ...card,
+          status: 'scheduled' as const,
+          scheduledDate,
+          scheduledLocation,
+          assignedTechnician,
+          requiredParts
+        };
       }
       return card;
     });

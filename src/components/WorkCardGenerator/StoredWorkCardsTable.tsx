@@ -26,6 +26,7 @@ interface StoredWorkCardsTableProps {
 
 export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSchedule, userRole }: StoredWorkCardsTableProps) {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [schedulingData, setSchedulingData] = useState({
     scheduledDate: '',
     scheduledLocation: '',
@@ -43,7 +44,14 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
         schedulingData.assignedTechnician,
         [{ partNumber: schedulingData.partNumber, quantity: Number(schedulingData.quantity) }]
       );
-      setSelectedCardId(null);
+      setIsDialogOpen(false);
+      setSchedulingData({
+        scheduledDate: '',
+        scheduledLocation: '',
+        assignedTechnician: '',
+        partNumber: '',
+        quantity: ''
+      });
     }
   };
 
@@ -86,7 +94,8 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
                   View Details
                 </Button>
                 {userRole === 'maintenance-planner' && card.status !== 'scheduled' && (
-                  <Dialog onOpenChange={(open) => {
+                  <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                    setIsDialogOpen(open);
                     if (open) {
                       setSelectedCardId(card.id);
                     } else {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -7,7 +6,9 @@ import ReactMarkdown from "react-markdown";
 import { ComplianceDirective } from "@/types/weststar";
 import { ComplianceAlert } from "./compliance/ComplianceAlert";
 import { ComplianceTable } from "./compliance/ComplianceTable";
-import { DirectiveInput } from "./compliance/DirectiveInput";
+import { NewDirectiveForm } from "./compliance/NewDirectiveForm";
+import { Button } from "./ui/button";
+import { Plus } from "lucide-react";
 
 interface ComplianceManagementProps {
   userRole: string;
@@ -22,9 +23,9 @@ interface ComplianceManagementProps {
 
 export function ComplianceManagement({ userRole, aircraft }: ComplianceManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewDirectiveModalOpen, setIsNewDirectiveModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
-  const [directive, setDirective] = useState("");
   const [showNewDirectiveAlert, setShowNewDirectiveAlert] = useState(false);
   const [directives, setDirectives] = useState<ComplianceDirective[]>([
     {
@@ -127,16 +128,15 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     }
   };
 
-  const handleAddDirective = async () => {
-    if (!directive.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a directive to analyze",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const handleAddDirective = async (formData: {
+    reference: string;
+    type: 'AD' | 'SB';
+    issuingBody: string;
+    title: string;
+    description: string;
+    priority: 'high' | 'medium' | 'low';
+    deadline: string;
+  }) => {
     setIsLoading(true);
     try {
       // Simulating AI analysis delay
@@ -144,28 +144,28 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
 
       const newDirective: ComplianceDirective = {
         id: `DIR-${Math.random().toString(36).substr(2, 9)}`,
-        type: "AD",
-        reference: directive,
-        issuingBody: "CAAM",
+        type: formData.type,
+        reference: formData.reference,
+        issuingBody: formData.issuingBody,
         applicableModels: [aircraft?.model || "AW139"],
-        title: `New Directive: ${directive}`,
-        description: "New directive under analysis. Details pending review.",
+        title: formData.title,
+        description: formData.description,
         effectiveDate: new Date().toISOString().split('T')[0],
         status: "open",
-        priority: "medium",
-        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+        priority: formData.priority,
+        deadline: formData.deadline,
       };
 
       setDirectives(prev => [newDirective, ...prev]);
-      setDirective("");
+      setIsNewDirectiveModalOpen(false);
       toast({
         title: "Success",
-        description: "New directive has been added and is under analysis",
+        description: "New directive has been added successfully",
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to analyze directive",
+        description: "Failed to add directive",
         variant: "destructive",
       });
     } finally {
@@ -179,12 +179,13 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-blue-900 flex justify-between items-center">
             <span>Compliance Monitoring - {aircraft?.tailNumber}</span>
-            <DirectiveInput
-              value={directive}
-              onChange={setDirective}
-              onSubmit={handleAddDirective}
-              isLoading={isLoading}
-            />
+            <Button
+              onClick={() => setIsNewDirectiveModalOpen(true)}
+              className="bg-blue-900 hover:bg-blue-800"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add New Directive
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -208,6 +209,15 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
           <div className="prose prose-sm max-w-none dark:prose-invert bg-gray-50 p-4 rounded-lg">
             <ReactMarkdown>{aiResponse}</ReactMarkdown>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isNewDirectiveModalOpen} onOpenChange={setIsNewDirectiveModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Add New Directive</DialogTitle>
+          </DialogHeader>
+          <NewDirectiveForm onSubmit={handleAddDirective} isLoading={isLoading} />
         </DialogContent>
       </Dialog>
     </>

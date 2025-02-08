@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -59,28 +59,30 @@ export function EnvironmentInput({ value, onChange }: EnvironmentInputProps) {
               value={inputValue}
               onValueChange={handleInputChange}
             />
-            <CommandEmpty>No environment found.</CommandEmpty>
-            <CommandGroup heading="Preset Environments">
-              {environmentPresets.map((env) => (
-                <CommandItem
-                  key={env.value}
-                  value={env.value}
-                  onSelect={(currentValue) => {
-                    onChange(currentValue);
-                    setInputValue(currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === env.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {env.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <CommandList>
+              <CommandEmpty>No environment found.</CommandEmpty>
+              <CommandGroup heading="Preset Environments">
+                {environmentPresets.map((env) => (
+                  <CommandItem
+                    key={env.value}
+                    value={env.value}
+                    onSelect={(currentValue) => {
+                      onChange(currentValue);
+                      setInputValue(currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === env.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {env.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
           </Command>
         </PopoverContent>
       </Popover>

@@ -45,6 +45,7 @@ export function StoredWorkCardsTable({ workCards, onDelete, onViewDetails, onSch
         [{ partNumber: schedulingData.partNumber, quantity: Number(schedulingData.quantity) }]
       );
       setIsDialogOpen(false);
+      setSelectedCardId(null);
       setSchedulingData({
         scheduledDate: '',
         scheduledLocation: '',

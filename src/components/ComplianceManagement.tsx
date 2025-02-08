@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -126,6 +127,52 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     }
   };
 
+  const handleAddDirective = async () => {
+    if (!directive.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a directive to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Simulating AI analysis delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const newDirective: ComplianceDirective = {
+        id: `DIR-${Math.random().toString(36).substr(2, 9)}`,
+        type: "AD",
+        reference: directive,
+        issuingBody: "CAAM",
+        applicableModels: [aircraft?.model || "AW139"],
+        title: `New Directive: ${directive}`,
+        description: "New directive under analysis. Details pending review.",
+        effectiveDate: new Date().toISOString().split('T')[0],
+        status: "open",
+        priority: "medium",
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+      };
+
+      setDirectives(prev => [newDirective, ...prev]);
+      setDirective("");
+      toast({
+        title: "Success",
+        description: "New directive has been added and is under analysis",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to analyze directive",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <Card className="w-full shadow-lg animate-fadeIn">
@@ -135,7 +182,7 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
             <DirectiveInput
               value={directive}
               onChange={setDirective}
-              onSubmit={() => {}}
+              onSubmit={handleAddDirective}
               isLoading={isLoading}
             />
           </CardTitle>

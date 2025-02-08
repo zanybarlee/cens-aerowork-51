@@ -88,6 +88,7 @@ export function StoredWorkCardsTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Work Card ID</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Environment</TableHead>
             <TableHead>Flight Hours</TableHead>

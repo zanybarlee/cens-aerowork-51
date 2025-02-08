@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle2, Clock, Eye, Trash2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, Eye, Trash2, BellRing } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,80 +23,119 @@ import ReactMarkdown from "react-markdown";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-
-interface ComplianceResponse {
-  id: string;
-  directive: string;
-  response: string;
-  timestamp: string;
-  deadline?: string;
-  priority?: 'high' | 'medium' | 'low';
-  status?: 'pending' | 'in-progress' | 'completed';
-}
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ComplianceDirective } from "@/types/weststar";
 
 interface ComplianceManagementProps {
   userRole: string;
+  aircraft?: {
+    tailNumber: string;
+    model: string;
+    flightHours: number;
+    cycles: number;
+    environment: string;
+  };
 }
 
-export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
+export function ComplianceManagement({ userRole, aircraft }: ComplianceManagementProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
   const [directive, setDirective] = useState("");
-  const [responses, setResponses] = useState<ComplianceResponse[]>([]);
-  const [selectedResponse, setSelectedResponse] = useState<ComplianceResponse | null>(null);
+  const [showNewDirectiveAlert, setShowNewDirectiveAlert] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Load stored responses from localStorage based on userRole
-    const storedResponses = localStorage.getItem(`complianceResponses_${userRole}`);
-    if (storedResponses) {
-      setResponses(JSON.parse(storedResponses));
-    }
-  }, [userRole]);
-
-  const complianceTasks = [
+  // Sample directives data - in a real app this would come from an API
+  const complianceDirectives: ComplianceDirective[] = [
     {
-      id: 1,
-      directive: "AD 2024-03",
-      description: "Main Rotor Blade Inspection",
-      deadline: "2024-04-15",
-      status: "pending",
+      id: "CAAM-2024-01",
+      type: "AD",
+      reference: "CAAM/AD/TRG-2024-01",
+      title: "Main Rotor Blade Inspection",
+      description: "Mandatory inspection of main rotor blades for possible delamination",
+      effectiveDate: "2024-03-15",
+      status: "open",
       priority: "high",
+      deadline: "2024-04-15"
     },
     {
-      id: 2,
-      directive: "SB 407-23-12",
-      description: "Tail Rotor Drive Shaft Check",
-      deadline: "2024-05-01",
-      status: "completed",
+      id: "SB-407-24-01",
+      type: "SB",
+      reference: "SB 407-24-01",
+      title: "Engine Control Unit Update",
+      description: "Software update for enhanced engine control system",
+      effectiveDate: "2024-02-01",
+      status: "closed",
       priority: "medium",
+      deadline: "2024-06-15"
     },
     {
-      id: 3,
-      directive: "AD 2024-02",
-      description: "Transmission Mount Inspection",
-      deadline: "2024-04-30",
-      status: "in-progress",
+      id: "CAAM-2024-02",
+      type: "AD",
+      reference: "CAAM/AD/TRG-2024-02",
+      title: "Tail Rotor Drive Shaft Inspection",
+      description: "Inspection of tail rotor drive shaft for wear patterns",
+      effectiveDate: "2024-03-01",
+      status: "open",
       priority: "high",
-    },
-    {
-      id: 4,
-      directive: "SB 407-24-01",
-      description: "Engine Control Unit Update",
-      deadline: "2024-06-15",
-      status: "pending",
-      priority: "medium",
-    },
-    {
-      id: 5,
-      directive: "AD 2024-04",
-      description: "Fuel System Inspection",
-      deadline: "2024-05-30",
-      status: "pending",
-      priority: "high",
+      deadline: "2024-04-30"
     }
   ];
+
+  // Filter directives based on aircraft data
+  const filterDirectives = (directives: ComplianceDirective[]) => {
+    if (!aircraft) return directives;
+
+    return directives.filter(directive => {
+      // Example filtering logic based on aircraft model and flight hours
+      const isRelevantToModel = directive.description.toLowerCase().includes('aw139') || 
+                               !directive.description.toLowerCase().includes('model');
+      
+      // Assuming some directives have flight hour thresholds in their description
+      const flightHourMatch = directive.description.toLowerCase().includes('flight hours') ? 
+        aircraft.flightHours >= 3000 : true;
+
+      return isRelevantToModel && flightHourMatch;
+    });
+  };
+
+  const filteredDirectives = filterDirectives(complianceDirectives);
+
+  const handleNewComplianceDirective = async () => {
+    if (!directive.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a directive to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const prompt = `Analyze compliance directive: ${directive} for AW139 helicopter`;
+      const response = await query({ question: prompt });
+      setAiResponse(response);
+      setIsModalOpen(true);
+      setDirective("");
+      
+      // Show new directive alert
+      setShowNewDirectiveAlert(true);
+      toast({
+        title: "New Directive Added",
+        description: "A new compliance directive has been added to the queue.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to analyze directive. Please try again.",
+        variant: "destructive",
+      });
+      console.error("Error analyzing directive:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const query = async (data: { question: string }) => {
     const response = await fetch(
@@ -112,93 +152,26 @@ export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
     return result.text;
   };
 
-  const handleNewComplianceTask = async () => {
-    if (!directive.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a directive to analyze",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const prompt = `can you provide Text Analysis and Categorization of ${directive}`;
-      const response = await query({ question: prompt });
-      
-      // Generate a random deadline between 15 and 45 days from now
-      const randomDays = Math.floor(Math.random() * (45 - 15 + 1)) + 15;
-      const deadline = new Date();
-      deadline.setDate(deadline.getDate() + randomDays);
-      
-      const newResponse: ComplianceResponse = {
-        id: Date.now().toString(),
-        directive: directive,
-        response: response,
-        timestamp: new Date().toLocaleString(),
-        deadline: deadline.toISOString().split('T')[0],
-        priority: Math.random() < 0.4 ? 'high' : Math.random() < 0.7 ? 'medium' : 'low',
-        status: 'pending'
-      };
-
-      const updatedResponses = [...responses, newResponse];
-      setResponses(updatedResponses);
-      localStorage.setItem(`complianceResponses_${userRole}`, JSON.stringify(updatedResponses));
-
-      setAiResponse(response);
-      setIsModalOpen(true);
-      setDirective("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to analyze directive. Please try again.",
-        variant: "destructive",
-      });
-      console.error("Error analyzing directive:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleViewResponse = (response: ComplianceResponse) => {
-    setSelectedResponse(response);
-    setAiResponse(response.response);
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteResponse = (id: string) => {
-    const updatedResponses = responses.filter(response => response.id !== id);
-    setResponses(updatedResponses);
-    localStorage.setItem(`complianceResponses_${userRole}`, JSON.stringify(updatedResponses));
-    
-    toast({
-      title: "Success",
-      description: "Response deleted successfully",
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "completed":
+      case "closed":
         return (
-          <Badge className="bg-workspace-success">
+          <Badge className="bg-green-500">
             <CheckCircle2 className="w-4 h-4 mr-1" />
-            Completed
+            Closed
           </Badge>
         );
-      case "in-progress":
+      case "open":
         return (
-          <Badge className="bg-workspace-warning">
+          <Badge className="bg-yellow-500">
             <Clock className="w-4 h-4 mr-1" />
-            In Progress
+            Open
           </Badge>
         );
-      case "pending":
+      case "not-applicable":
         return (
-          <Badge className="bg-workspace-error">
-            <AlertCircle className="w-4 h-4 mr-1" />
-            Pending
+          <Badge variant="outline">
+            Not Applicable
           </Badge>
         );
       default:
@@ -221,10 +194,10 @@ export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
 
   return (
     <>
-      <Card className="w-full transition-all duration-300 hover:shadow-lg animate-fadeIn">
+      <Card className="w-full shadow-lg animate-fadeIn">
         <CardHeader>
-          <CardTitle className="text-xl font-semibold text-workspace-text flex justify-between items-center">
-            <span>Compliance Management</span>
+          <CardTitle className="text-xl font-semibold text-blue-900 flex justify-between items-center">
+            <span>Compliance Monitoring</span>
             <div className="flex gap-4 items-center">
               <div className="flex-grow">
                 <Label htmlFor="directive" className="sr-only">
@@ -232,29 +205,42 @@ export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
                 </Label>
                 <Input
                   id="directive"
-                  placeholder="Enter directive to analyze..."
+                  placeholder="Enter new directive to analyze..."
                   value={directive}
                   onChange={(e) => setDirective(e.target.value)}
                   className="min-w-[300px]"
                 />
               </div>
               <Button
-                className="bg-workspace-primary hover:bg-workspace-primary/90"
-                onClick={handleNewComplianceTask}
+                className="bg-blue-900 hover:bg-blue-800"
+                onClick={handleNewComplianceDirective}
                 disabled={isLoading}
               >
-                {isLoading ? "Analyzing..." : "New Compliance Task"}
+                {isLoading ? "Analyzing..." : "Add New Directive"}
               </Button>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {showNewDirectiveAlert && (
+            <Alert className="bg-blue-50 border-blue-200">
+              <BellRing className="h-4 w-4" />
+              <AlertTitle>New Directive Alert</AlertTitle>
+              <AlertDescription>
+                A new directive has been added that matches AW139 (9M-WST) status.
+                Please review and take necessary action.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Directive</TableHead>
-                  <TableHead>Description</TableHead>
+                  <TableHead>Reference ID</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Effective Date</TableHead>
                   <TableHead>Deadline</TableHead>
                   <TableHead>Priority</TableHead>
                   <TableHead>Status</TableHead>
@@ -262,19 +248,28 @@ export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {complianceTasks.map((task) => (
-                  <TableRow key={task.id}>
-                    <TableCell className="font-medium">{task.directive}</TableCell>
-                    <TableCell>{task.description}</TableCell>
-                    <TableCell>{task.deadline}</TableCell>
-                    <TableCell>{getPriorityBadge(task.priority)}</TableCell>
-                    <TableCell>{getStatusBadge(task.status)}</TableCell>
+                {filteredDirectives.map((directive) => (
+                  <TableRow key={directive.id}>
+                    <TableCell className="font-medium">{directive.reference}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{directive.type}</Badge>
+                    </TableCell>
+                    <TableCell>{directive.title}</TableCell>
+                    <TableCell>{directive.effectiveDate}</TableCell>
+                    <TableCell>{directive.deadline}</TableCell>
+                    <TableCell>{getPriorityBadge(directive.priority)}</TableCell>
+                    <TableCell>{getStatusBadge(directive.status)}</TableCell>
                     <TableCell>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="text-workspace-primary hover:text-workspace-primary/90"
+                        className="text-blue-900 hover:text-blue-800"
+                        onClick={() => {
+                          setAiResponse(directive.description);
+                          setIsModalOpen(true);
+                        }}
                       >
+                        <Eye className="w-4 h-4 mr-1" />
                         View Details
                       </Button>
                     </TableCell>
@@ -283,77 +278,15 @@ export function ComplianceManagement({ userRole }: ComplianceManagementProps) {
               </TableBody>
             </Table>
           </div>
-
-          {responses.length > 0 && (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Directive</TableHead>
-                    <TableHead>Deadline</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {responses.map((response) => (
-                    <TableRow key={response.id}>
-                      <TableCell className="font-medium max-w-[200px]">
-                        <span className="block truncate" title={response.directive}>
-                          {response.directive}
-                        </span>
-                      </TableCell>
-                      <TableCell>{response.deadline}</TableCell>
-                      <TableCell>{getPriorityBadge(response.priority || 'medium')}</TableCell>
-                      <TableCell>{getStatusBadge(response.status || 'pending')}</TableCell>
-                      <TableCell>{response.timestamp}</TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleViewResponse(response)}
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteResponse(response.id)}
-                          className="text-destructive hover:text-destructive/90"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
         </CardContent>
       </Card>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              Compliance Analysis
-              {selectedResponse && (
-                <span className="text-sm font-normal text-muted-foreground ml-2">
-                  ({selectedResponse.timestamp})
-                </span>
-              )}
-            </DialogTitle>
-            {selectedResponse && (
-              <DialogDescription>
-                Directive: {selectedResponse.directive}
-              </DialogDescription>
-            )}
+            <DialogTitle>Directive Details</DialogTitle>
           </DialogHeader>
-          <div className="prose prose-sm max-w-none dark:prose-invert bg-muted p-4 rounded-lg">
+          <div className="prose prose-sm max-w-none dark:prose-invert bg-gray-50 p-4 rounded-lg">
             <ReactMarkdown>{aiResponse}</ReactMarkdown>
           </div>
         </DialogContent>

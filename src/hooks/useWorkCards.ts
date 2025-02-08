@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { StoredWorkCard } from "@/types/workCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -20,9 +21,9 @@ export const useWorkCards = (userRole: string) => {
   
   const { toast } = useToast();
 
-  // Effect to periodically refresh the work cards from localStorage
+  // Single effect to handle all refresh logic
   useEffect(() => {
-    const refreshInterval = setInterval(() => {
+    const refreshData = () => {
       const plannerCards = localStorage.getItem("workCards_maintenance-planner");
       const technicianCards = localStorage.getItem("workCards_engineer-technician");
       
@@ -37,8 +38,14 @@ export const useWorkCards = (userRole: string) => {
           setStoredWorkCards(JSON.parse(saved));
         }
       }
-    }, 1000); // Refresh every second
+    };
 
+    // Initial refresh
+    refreshData();
+
+    // Set up interval for periodic refresh
+    const refreshInterval = setInterval(refreshData, 1000);
+    
     return () => clearInterval(refreshInterval);
   }, [userRole]);
 
@@ -73,30 +80,26 @@ export const useWorkCards = (userRole: string) => {
   ) => {
     const updatedWorkCards = storedWorkCards.map(card => {
       if (card.id === cardId) {
-        const updatedCard = {
+        return {
           ...card,
           status: 'scheduled' as const,
           scheduledDate,
           scheduledLocation,
           assignedTechnician,
           requiredParts
-        } satisfies StoredWorkCard;
-        return updatedCard;
+        };
       }
       return card;
     });
     
-    // Update both planner and technician storage
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
     
-    // If current user is planner, also update technician's storage
     if (userRole === 'maintenance-planner') {
       const technicianCards = localStorage.getItem("workCards_engineer-technician");
       const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
       const updatedTechnicianCards = [...technicianData];
       
-      // Find if the card already exists in technician's storage
       const cardIndex = updatedTechnicianCards.findIndex(card => card.id === cardId);
       if (cardIndex >= 0) {
         updatedTechnicianCards[cardIndex] = updatedWorkCards.find(card => card.id === cardId)!;
@@ -106,11 +109,6 @@ export const useWorkCards = (userRole: string) => {
       
       localStorage.setItem("workCards_engineer-technician", JSON.stringify(updatedTechnicianCards));
     }
-    
-    // Force a refresh by triggering another state update after a short delay
-    setTimeout(() => {
-      setStoredWorkCards([...updatedWorkCards]);
-    }, 100);
     
     const isUpdate = storedWorkCards.find(card => card.id === cardId)?.status === 'scheduled';
     

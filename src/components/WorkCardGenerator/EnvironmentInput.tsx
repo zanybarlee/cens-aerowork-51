@@ -24,13 +24,18 @@ const environmentPresets = [
 
 export function EnvironmentInput({ value, onChange }: EnvironmentInputProps) {
   const [open, setOpen] = React.useState(false);
-  const [inputValue, setInputValue] = React.useState(value);
+  const [inputValue, setInputValue] = React.useState(value || "");
 
   // Handle direct input changes
   const handleInputChange = (newValue: string) => {
     setInputValue(newValue);
     onChange(newValue);
   };
+
+  // Reset input value when value prop changes
+  React.useEffect(() => {
+    setInputValue(value || "");
+  }, [value]);
 
   return (
     <div className="space-y-2">
@@ -55,7 +60,7 @@ export function EnvironmentInput({ value, onChange }: EnvironmentInputProps) {
               onValueChange={handleInputChange}
             />
             <CommandEmpty>No environment found.</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup heading="Preset Environments">
               {environmentPresets.map((env) => (
                 <CommandItem
                   key={env.value}

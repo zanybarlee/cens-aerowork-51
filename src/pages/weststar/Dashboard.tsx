@@ -11,10 +11,18 @@ import { Calendar } from "@/components/ui/calendar";
 import { useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { RoleSelector, UserRole } from "@/components/RoleSelector";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function WeststarDashboard() {
   const [selectedRole, setSelectedRole] = useState<string>("planner");
   const [showRoleSelector, setShowRoleSelector] = useState(true);
+  const [showAircraftDetails, setShowAircraftDetails] = useState(false);
   const navigate = useNavigate();
   
   const aircraft: Aircraft = {
@@ -94,7 +102,10 @@ export default function WeststarDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column */}
           <div className="lg:col-span-3 space-y-6">
-            <Card className="bg-white shadow-md">
+            <Card 
+              className="bg-white shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => setShowAircraftDetails(true)}
+            >
               <CardHeader>
                 <CardTitle className="text-lg font-semibold">Aircraft Status</CardTitle>
               </CardHeader>
@@ -133,6 +144,71 @@ export default function WeststarDashboard() {
             </Card>
 
             <MainDashboard />
+
+            <Dialog open={showAircraftDetails} onOpenChange={setShowAircraftDetails}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Aircraft Status Details</DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="max-h-[60vh]">
+                  <div className="space-y-4 p-4">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="font-semibold text-lg text-blue-900 mb-2">Basic Information</h3>
+                        <div className="space-y-2">
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Tail Number:</span>
+                            <span className="font-medium">{aircraft.tailNumber}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Model:</span>
+                            <span className="font-medium">{aircraft.model}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Environment:</span>
+                            <span className="font-medium capitalize">{aircraft.environment}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold text-lg text-blue-900 mb-2">Usage Statistics</h3>
+                        <div className="space-y-2">
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Total Flight Hours:</span>
+                            <span className="font-medium">{aircraft.flightHours}</span>
+                          </p>
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Total Cycles:</span>
+                            <span className="font-medium">{aircraft.cycles}</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="font-semibold text-lg text-blue-900 mb-2">Maintenance Information</h3>
+                        <div className="space-y-2">
+                          <p className="flex justify-between">
+                            <span className="text-gray-600">Last Inspection:</span>
+                            <span className="font-medium">
+                              {new Date(aircraft.lastInspectionDate!).toLocaleDateString()}
+                            </span>
+                          </p>
+                          {aircraft.nextInspectionDue && (
+                            <p className="flex justify-between">
+                              <span className="text-gray-600">Next Inspection Due:</span>
+                              <span className="font-medium">
+                                {new Date(aircraft.nextInspectionDue).toLocaleDateString()}
+                              </span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Right Column */}
@@ -144,3 +220,4 @@ export default function WeststarDashboard() {
     </>
   );
 }
+

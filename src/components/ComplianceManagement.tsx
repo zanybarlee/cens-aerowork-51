@@ -10,6 +10,7 @@ import { DirectiveDetailsModal } from "./compliance/DirectiveDetailsModal";
 import { useDirectives } from "@/hooks/useDirectives";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
+import { ComplianceDirective } from "@/types/weststar";
 
 interface ComplianceManagementProps {
   userRole: string;
@@ -138,3 +139,4 @@ export function ComplianceManagement({ userRole, aircraft }: ComplianceManagemen
     </>
   );
 }
+

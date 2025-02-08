@@ -27,9 +27,8 @@ export function ComboboxField({
   placeholder,
 }: ComboboxFieldProps) {
   const getDisplayValue = () => {
-    if (!value) return placeholder;
-    const option = options.find(opt => opt.value === value || opt.label === value);
-    return option ? option.label : value;
+    const option = options.find(opt => opt.value === value);
+    return option ? option.label : value || placeholder;
   };
 
   return (
@@ -51,6 +50,11 @@ export function ComboboxField({
           <Command>
             <CommandInput 
               placeholder={`Search or enter custom ${label.toLowerCase()}...`}
+              onValueChange={(search) => {
+                if (!options.some(opt => opt.value === search || opt.label === search)) {
+                  onChange(search);
+                }
+              }}
             />
             <CommandList>
               <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
@@ -59,7 +63,7 @@ export function ComboboxField({
                   <CommandItem
                     key={option.value}
                     value={option.value}
-                    onSelect={() => {
+                    onSelect={(currentValue) => {
                       onChange(option.value);
                       setOpen(false);
                     }}

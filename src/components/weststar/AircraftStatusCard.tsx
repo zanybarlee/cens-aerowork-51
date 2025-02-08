@@ -14,8 +14,19 @@ export function AircraftStatusCard({ aircraft, onClick }: AircraftStatusCardProp
       className="bg-white shadow-md hover:shadow-lg transition-shadow cursor-pointer"
       onClick={onClick}
     >
-      <CardHeader>
+      <CardHeader className="space-y-2">
         <CardTitle className="text-lg font-semibold">Aircraft Status</CardTitle>
+        <div className="w-full h-48 relative overflow-hidden rounded-md">
+          <img
+            src="/aw139-helicopter.jpg"
+            alt="AW139 Helicopter"
+            className="object-cover w-full h-full"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/placeholder.svg";
+            }}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">

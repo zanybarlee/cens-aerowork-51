@@ -34,7 +34,7 @@ export function WorkCardTableRow({
       <TableCell>{card.cycles}</TableCell>
       <TableCell>
         <Badge variant={card.status === 'scheduled' ? 'default' : 'secondary'}>
-          {card.status || 'draft'}
+          {card.status === 'scheduled' ? `Scheduled: ${new Date(card.scheduledDate!).toLocaleDateString()}` : 'draft'}
         </Badge>
       </TableCell>
       <TableCell className="text-right space-x-2">

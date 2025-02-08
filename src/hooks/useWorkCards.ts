@@ -1,18 +1,31 @@
-
 import { useState, useEffect } from "react";
 import { StoredWorkCard } from "@/types/workCard";
 import { useToast } from "@/components/ui/use-toast";
 
 export const useWorkCards = (userRole: string) => {
   const [storedWorkCards, setStoredWorkCards] = useState<StoredWorkCard[]>(() => {
-    const plannerCards = localStorage.getItem("workCards_maintenance-planner");
-    const technicianCards = localStorage.getItem("workCards_engineer-technician");
-    
-    const plannerData = plannerCards ? JSON.parse(plannerCards) : [];
-    const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
-    
     if (userRole === "engineer-technician") {
-      return [...plannerData, ...technicianData];
+      const plannerCards = localStorage.getItem("workCards_maintenance-planner") || "[]";
+      const technicianCards = localStorage.getItem("workCards_engineer-technician") || "[]";
+      
+      const plannerData = JSON.parse(plannerCards);
+      const technicianData = JSON.parse(technicianCards);
+      
+      // Combine cards and remove duplicates based on ID
+      const allCards = [...plannerData, ...technicianData];
+      const uniqueCards = allCards.reduce((acc: StoredWorkCard[], current) => {
+        const exists = acc.find(card => card.id === current.id);
+        if (!exists) {
+          acc.push(current);
+        } else if (exists.status !== current.status) {
+          // If statuses differ, keep the most recent version
+          const existingIndex = acc.findIndex(card => card.id === current.id);
+          acc[existingIndex] = current;
+        }
+        return acc;
+      }, []);
+      
+      return uniqueCards;
     }
     
     const saved = localStorage.getItem(`workCards_${userRole}`);
@@ -23,14 +36,28 @@ export const useWorkCards = (userRole: string) => {
 
   useEffect(() => {
     const refreshData = () => {
-      const plannerCards = localStorage.getItem("workCards_maintenance-planner");
-      const technicianCards = localStorage.getItem("workCards_engineer-technician");
-      
-      const plannerData = plannerCards ? JSON.parse(plannerCards) : [];
-      const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
-      
       if (userRole === "engineer-technician") {
-        setStoredWorkCards([...plannerData, ...technicianData]);
+        const plannerCards = localStorage.getItem("workCards_maintenance-planner") || "[]";
+        const technicianCards = localStorage.getItem("workCards_engineer-technician") || "[]";
+        
+        const plannerData = JSON.parse(plannerCards);
+        const technicianData = JSON.parse(technicianCards);
+        
+        // Combine cards and remove duplicates based on ID
+        const allCards = [...plannerData, ...technicianData];
+        const uniqueCards = allCards.reduce((acc: StoredWorkCard[], current) => {
+          const exists = acc.find(card => card.id === current.id);
+          if (!exists) {
+            acc.push(current);
+          } else if (exists.status !== current.status) {
+            // If statuses differ, keep the most recent version
+            const existingIndex = acc.findIndex(card => card.id === current.id);
+            acc[existingIndex] = current;
+          }
+          return acc;
+        }, []);
+        
+        setStoredWorkCards(uniqueCards);
       } else {
         const saved = localStorage.getItem(`workCards_${userRole}`);
         if (saved) {
@@ -45,27 +72,38 @@ export const useWorkCards = (userRole: string) => {
   }, [userRole]);
 
   const addWorkCard = (newWorkCard: StoredWorkCard) => {
-    const updatedWorkCards = storedWorkCards.map(card => 
-      card.id === newWorkCard.id ? newWorkCard : card
-    );
-
-    if (!updatedWorkCards.find(card => card.id === newWorkCard.id)) {
-      updatedWorkCards.unshift(newWorkCard);
-    }
-
-    setStoredWorkCards(updatedWorkCards);
-    localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
-    
-    if (newWorkCard.status === 'completed') {
-      // Update both planner and technician storage for completed cards
-      const plannerCards = localStorage.getItem("workCards_maintenance-planner");
-      if (plannerCards) {
+    if (userRole === "engineer-technician") {
+      // For technicians, update both storages when completing a card
+      if (newWorkCard.status === 'completed') {
+        const plannerCards = localStorage.getItem("workCards_maintenance-planner") || "[]";
         const plannerData = JSON.parse(plannerCards);
         const updatedPlannerCards = plannerData.map((card: StoredWorkCard) =>
           card.id === newWorkCard.id ? newWorkCard : card
         );
         localStorage.setItem("workCards_maintenance-planner", JSON.stringify(updatedPlannerCards));
+        
+        const technicianCards = localStorage.getItem("workCards_engineer-technician") || "[]";
+        const technicianData = JSON.parse(technicianCards);
+        const updatedTechnicianCards = technicianData.map((card: StoredWorkCard) =>
+          card.id === newWorkCard.id ? newWorkCard : card
+        );
+        if (!updatedTechnicianCards.find(card => card.id === newWorkCard.id)) {
+          updatedTechnicianCards.push(newWorkCard);
+        }
+        localStorage.setItem("workCards_engineer-technician", JSON.stringify(updatedTechnicianCards));
       }
+    } else {
+      // For planners, update their storage normally
+      const updatedWorkCards = storedWorkCards.map(card => 
+        card.id === newWorkCard.id ? newWorkCard : card
+      );
+
+      if (!updatedWorkCards.find(card => card.id === newWorkCard.id)) {
+        updatedWorkCards.unshift(newWorkCard);
+      }
+
+      setStoredWorkCards(updatedWorkCards);
+      localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
     }
   };
 
@@ -73,6 +111,14 @@ export const useWorkCards = (userRole: string) => {
     const updatedWorkCards = storedWorkCards.filter((card) => card.id !== id);
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
+    
+    // If technician deletes a card, also remove from planner's storage
+    if (userRole === "engineer-technician") {
+      const plannerCards = localStorage.getItem("workCards_maintenance-planner") || "[]";
+      const plannerData = JSON.parse(plannerCards);
+      const updatedPlannerCards = plannerData.filter((card: StoredWorkCard) => card.id !== id);
+      localStorage.setItem("workCards_maintenance-planner", JSON.stringify(updatedPlannerCards));
+    }
     
     toast({
       title: "Work Card Deleted",
@@ -104,19 +150,22 @@ export const useWorkCards = (userRole: string) => {
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
     
+    // When a planner schedules a card, add it to technician's storage
     if (userRole === 'maintenance-planner') {
-      const technicianCards = localStorage.getItem("workCards_engineer-technician");
-      const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
+      const technicianCards = localStorage.getItem("workCards_engineer-technician") || "[]";
+      const technicianData = JSON.parse(technicianCards);
       const updatedTechnicianCards = [...technicianData];
       
-      const cardIndex = updatedTechnicianCards.findIndex(card => card.id === cardId);
-      if (cardIndex >= 0) {
-        updatedTechnicianCards[cardIndex] = updatedWorkCards.find(card => card.id === cardId)!;
-      } else {
-        updatedTechnicianCards.push(updatedWorkCards.find(card => card.id === cardId)!);
+      const scheduledCard = updatedWorkCards.find(card => card.id === cardId);
+      if (scheduledCard) {
+        const existingIndex = updatedTechnicianCards.findIndex(card => card.id === cardId);
+        if (existingIndex >= 0) {
+          updatedTechnicianCards[existingIndex] = scheduledCard;
+        } else {
+          updatedTechnicianCards.push(scheduledCard);
+        }
+        localStorage.setItem("workCards_engineer-technician", JSON.stringify(updatedTechnicianCards));
       }
-      
-      localStorage.setItem("workCards_engineer-technician", JSON.stringify(updatedTechnicianCards));
     }
     
     const isUpdate = storedWorkCards.find(card => card.id === cardId)?.status === 'scheduled';

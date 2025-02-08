@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ComplianceManagement } from "@/components/ComplianceManagement";
 import { WorkCardForm } from "@/components/WorkCardForm";
 import { MainDashboard } from "@/components/MainDashboard";
+import { MaintenanceScheduler } from "@/components/MaintenanceScheduler";
 import { Aircraft } from "@/types/weststar";
 
 export default function WeststarDashboard() {
@@ -46,6 +47,7 @@ export default function WeststarDashboard() {
         </Card>
 
         <MainDashboard />
+        <MaintenanceScheduler aircraft={aircraft} />
       </div>
 
       <div className="space-y-6">

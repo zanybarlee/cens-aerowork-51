@@ -65,8 +65,26 @@ export const useWorkCards = (userRole: string) => {
       return card;
     });
     
+    // Update both planner and technician storage
     setStoredWorkCards(updatedWorkCards);
     localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
+    
+    // If current user is planner, also update technician's storage
+    if (userRole === 'maintenance-planner') {
+      const technicianCards = localStorage.getItem("workCards_engineer-technician");
+      const technicianData = technicianCards ? JSON.parse(technicianCards) : [];
+      const updatedTechnicianCards = [...technicianData];
+      
+      // Find if the card already exists in technician's storage
+      const cardIndex = updatedTechnicianCards.findIndex(card => card.id === cardId);
+      if (cardIndex >= 0) {
+        updatedTechnicianCards[cardIndex] = updatedWorkCards.find(card => card.id === cardId)!;
+      } else {
+        updatedTechnicianCards.push(updatedWorkCards.find(card => card.id === cardId)!);
+      }
+      
+      localStorage.setItem("workCards_engineer-technician", JSON.stringify(updatedTechnicianCards));
+    }
     
     // Force a refresh by triggering another state update after a short delay
     setTimeout(() => {

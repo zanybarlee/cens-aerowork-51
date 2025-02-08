@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { StoredWorkCard } from "@/types/workCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -42,9 +43,27 @@ export const useWorkCards = (userRole: string) => {
     });
   };
 
+  const scheduleWorkCard = (cardId: string, schedulingData: Partial<StoredWorkCard>) => {
+    const updatedWorkCards = storedWorkCards.map(card => {
+      if (card.id === cardId) {
+        return { ...card, ...schedulingData, status: 'scheduled' as const };
+      }
+      return card;
+    });
+    
+    setStoredWorkCards(updatedWorkCards);
+    localStorage.setItem(`workCards_${userRole}`, JSON.stringify(updatedWorkCards));
+    
+    toast({
+      title: "Work Card Scheduled",
+      description: "The work card has been scheduled successfully.",
+    });
+  };
+
   return {
     storedWorkCards,
     addWorkCard,
-    deleteWorkCard
+    deleteWorkCard,
+    scheduleWorkCard
   };
 };

@@ -21,8 +21,9 @@ export function WorkCardForm({ userRole, aircraft }: WorkCardFormProps) {
   const handleSubmit = async (flightHours: string, cycles: string, environment: string) => {
     const generatedCard = await generateWorkCard(flightHours, cycles, environment);
     if (generatedCard) {
+      const workCardId = `WC-${new Date().getFullYear()}-${uuidv4().slice(0, 8)}`.toUpperCase();
       const newCard: StoredWorkCard = {
-        id: uuidv4(),
+        id: workCardId,
         content: generatedCard,
         flightHours,
         cycles,

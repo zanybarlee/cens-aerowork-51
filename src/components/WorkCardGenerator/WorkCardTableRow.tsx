@@ -26,6 +26,7 @@ export function WorkCardTableRow({
       className={userRole === 'maintenance-planner' ? 'cursor-pointer hover:bg-gray-50' : ''}
       onClick={() => onRowClick(card)}
     >
+      <TableCell className="font-medium">{card.id}</TableCell>
       <TableCell>{card.date}</TableCell>
       <TableCell>
         <Badge variant="outline">{card.environment}</Badge>

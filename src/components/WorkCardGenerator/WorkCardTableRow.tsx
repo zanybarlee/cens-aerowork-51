@@ -25,7 +25,7 @@ export function WorkCardTableRow({
     switch (card.status) {
       case 'completed':
         return (
-          <Badge variant="success" className="bg-green-500">
+          <Badge variant="secondary" className="bg-green-500 text-white hover:bg-green-600">
             Completed on {card.completionDate}
           </Badge>
         );

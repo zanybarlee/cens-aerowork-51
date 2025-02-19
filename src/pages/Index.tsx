@@ -42,9 +42,7 @@ const Index = () => {
 
       {/* Benefits Section */}
       <section className="container mx-auto py-16 px-4 bg-workspace-secondary/5 rounded-lg">
-        <h2 className="text-3xl font-bold text-workspace-primary text-center mb-12">
-          Why Choose Aptiv8 GenAI AeroGuardian?
-        </h2>
+        <h2 className="text-3xl font-bold text-workspace-primary text-center mb-12">Why Choose GenAI AeroGuardian?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <BenefitItem icon={<Wrench className="w-6 h-6 text-workspace-primary" />} title="Reduced Maintenance Time" description="Cut operational costs with AI-optimized maintenance scheduling" />
           <BenefitItem icon={<UserCheck className="w-6 h-6 text-workspace-primary" />} title="Enhanced Compliance" description="Automated tracking of regulatory requirements and standards" />

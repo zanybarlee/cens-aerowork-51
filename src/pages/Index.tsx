@@ -59,9 +59,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-workspace-primary">
             Ready to Transform Your MRO Operations?
           </h2>
-          <p className="text-lg text-workspace-text/80">
-            Join the future of aerospace maintenance with Aptiv8 GenAI AeroGuardian
-          </p>
+          <p className="text-lg text-workspace-text/80">Join the future of aerospace maintenance with GenAI AeroGuardian</p>
           <Button className="bg-workspace-primary hover:bg-workspace-primary/90 text-white px-8 py-6 text-lg mt-6" onClick={() => navigate("/login")}>
             Contact Sales
           </Button>

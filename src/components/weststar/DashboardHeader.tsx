@@ -15,7 +15,7 @@ export function DashboardHeader({ selectedRole, showRoleSelector, onLogout }: Da
     <div className="flex items-center justify-between mb-8">
       <div className="flex items-center gap-4">
         <h1 className="text-3xl font-bold text-blue-900">
-          Weststar Aviation Services - AW139 Maintenance
+          Asia Aviation Services - AW139 Maintenance
         </h1>
         {!showRoleSelector && (
           <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-md">

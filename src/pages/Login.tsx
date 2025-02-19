@@ -13,14 +13,14 @@ const Login = () => {
   const { toast } = useToast();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [tenant, setTenant] = React.useState("weststar");
+  const [tenant, setTenant] = React.useState("asia");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you would validate credentials here
-    if (tenant === "weststar") {
+    if (tenant === "asia") {
       toast({
-        title: "Welcome to Weststar Aviation Services",
+        title: "Welcome to Asia Aviation Services",
         description: "Redirecting to MRO dashboard...",
       });
       navigate("/weststar");
@@ -46,9 +46,9 @@ const Login = () => {
       <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center font-bold">
-            {tenant === "weststar" ? (
+            {tenant === "asia" ? (
               <div className="space-y-2">
-                <div className="text-blue-900">Weststar Aviation Services</div>
+                <div className="text-blue-900">Asia Aviation Services</div>
                 <div className="text-lg text-blue-700">MRO Management System</div>
               </div>
             ) : (
@@ -66,7 +66,7 @@ const Login = () => {
                 value={tenant}
                 onChange={(e) => setTenant(e.target.value)}
               >
-                <option value="weststar">Weststar Aviation Services</option>
+                <option value="asia">Asia Aviation Services</option>
                 <option value="default">AeroGuardian Default</option>
               </select>
             </div>
